@@ -3,8 +3,8 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "test": "echo // TODO npx jest",
-    "lint": "echo // TODO npx eslint --fix 'src/{!(dist),}/*.ts' './jest.config.ts'",
+    "test": "npx jest",
+    "lint": "npx eslint --fix './packages/**/src/**/*.ts' './packages/**/__tests__/**/*.ts' './test.env.d.ts' ",
     "prepare": "husky install",
     "_first_build": "npx lerna run build --scope=@flysystem-ts/common",
     "_second_build": "npx lerna run build --scope=@flysystem-ts/adapter-interface",
@@ -37,6 +37,7 @@
     "husky": "^8.0.1",
     "jest": "^28.1.0",
     "ts-jest": "^28.0.4",
+    "ts-node": "^10.8.0",
     "typescript": "^4.7.2"
   }
 }
