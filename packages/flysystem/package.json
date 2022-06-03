@@ -29,7 +29,12 @@
     "url": "https://github.com/Ghost-Drive/flysystem-ts/issues"
   },
   "devDependencies": {
+    "@flysystem-ts/adapter-interface": "^0.0.0",
     "@flysystem-ts/common": "^0.0.0",
-    "@flysystem-ts/adapter-interface": "^0.0.0"
+    "lodash": "^4.17.21"
+  },
+  "dependencies": {
+    "@flysystem-ts/adapter-interface": "^0.0.0",
+    "@flysystem-ts/common": "^0.0.0"
   }
 }

@@ -6,9 +6,14 @@
     "test": "npx jest",
     "lint": "npx eslint --fix './packages/*/src/**/*.ts' './packages/*/__tests__/**/*.ts' './test.env.d.ts' ",
     "prepare": "husky install",
-    "_first_build": "npx lerna run build --scope=@flysystem-ts/common",
-    "_second_build": "npx lerna run build --scope=@flysystem-ts/adapter-interface",
-    "build": "npm run _first_build && npm run _second_build && npx lerna run build"
+    "_1_install": "npx lerna exec 'npm i' --scope=@flysystem-ts/common",
+    "_1_build": "npx lerna run build --scope=@flysystem-ts/common",
+    "_2_install": "npx lerna exec 'npm i' --scope=@flysystem-ts/adapter-interface",
+    "_2_build": "npx lerna run build --scope=@flysystem-ts/adapter-interface",
+    "_3_1_install": "npx lerna add @flysystem-ts/common --scope=@flysystem-ts/flysystem",
+    "_3_2_install": "npx lerna add @flysystem-ts/adapter-interface --scope=@flysystem-ts/flysystem",
+    "_3_build": "npx lerna run build --scope=@flysystem-ts/flysystem",
+    "lerna:bootstrap": "npm run _1_install && npm run _1_build && npm run _2_install && npm run _2_build && npm run _3_1_install && npm run _3_2_install && npm run _3_build"
   },
   "husky": {
     "hooks": {
