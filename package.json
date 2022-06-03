@@ -4,7 +4,7 @@
   "main": "index.js",
   "scripts": {
     "test": "npx jest",
-    "lint": "npx eslint --fix './packages/**/src/**/*.ts' './packages/**/__tests__/**/*.ts' './test.env.d.ts' ",
+    "lint": "npx eslint --fix './packages/*/src/**/*.ts' './packages/*/__tests__/**/*.ts' './test.env.d.ts' ",
     "prepare": "husky install",
     "_first_build": "npx lerna run build --scope=@flysystem-ts/common",
     "_second_build": "npx lerna run build --scope=@flysystem-ts/adapter-interface",

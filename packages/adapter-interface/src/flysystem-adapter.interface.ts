@@ -1,11 +1,14 @@
 import { ReadStream } from 'fs';
 import { Readable } from 'stream';
-import { VisibilityEnum } from '../enum';
-import { FileAttributes, PathPrefixer } from '../libs';
-import { IStorageAttributes } from './storage-attributes.interface';
-import { RequirePart } from './require-part.type';
-import { ReadFileOptionsInterface } from './read-file-options.interface';
-import { VisibilityInterface } from './visibility.interface';
+import {
+    VisibilityEnum,
+    IStorageAttributes,
+    FileAttributes,
+    RequirePart,
+    PathPrefixer,
+    ReadFileOptionsInterface,
+    VisibilityInterface,
+} from '@flysystem-ts/common';
 
 export interface IFlysystemAdapter {
   getPathPrefix(): PathPrefixer;

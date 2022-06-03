@@ -7,3 +7,5 @@ export * from './mime-type-detector';
 export * from './visibility-converter';
 export * from './path/path-normalizer';
 export * from './require-part.type';
+export * from './read-file-options.interface';
+export * from './visibility.interface';
