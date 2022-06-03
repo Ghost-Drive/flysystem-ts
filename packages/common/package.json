@@ -27,5 +27,12 @@
   },
   "bugs": {
     "url": "https://github.com/Ghost-Drive/flysystem-ts/issues"
+  },
+  "devDependencies": {
+    "file-type": "14",
+    "mime": "^3.0.0",
+    "@types/lodash": "^4.14.182",
+    "@types/mime": "^2.0.3",
+    "lodash": "^4.17.21"
   }
 }
