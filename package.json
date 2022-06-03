@@ -5,7 +5,10 @@
   "scripts": {
     "test": "echo // TODO npx jest",
     "lint": "echo // TODO npx eslint --fix 'src/{!(dist),}/*.ts' './jest.config.ts'",
-    "prepare": "husky install"
+    "prepare": "husky install",
+    "_first_build": "npx lerna run build --scope=@flysystem-ts/common",
+    "_second_build": "npx lerna run build --scope=@flysystem-ts/adapter-interface",
+    "build": "npm run _first_build && npm run _second_build && npx lerna run build"
   },
   "husky": {
     "hooks": {
