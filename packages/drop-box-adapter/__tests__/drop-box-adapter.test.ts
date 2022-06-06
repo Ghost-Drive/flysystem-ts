@@ -16,11 +16,15 @@ describe('Drop-box-adapter package testing', () => {
         expect(process.env.DBX_ACCESS).toBeDefined();
     });
 
-    it('Should return lest of files', async () => {
+    it('Should return list of files', async () => {
         const res = await flysystem.listContents();
 
-        console.log(res);
-
         expect(res).toBeInstanceOf(Array);
+    });
+
+    it('Should return "false". Folder is not exists', async () => {
+        const res = await flysystem.directoryExists('no-such-directory');
+
+        expect(res).toBe(false);
     });
 });
