@@ -33,6 +33,7 @@
     "@flysystem-ts/common": "^0.0.0"
   },
   "devDependencies": {
-    "@flysystem-ts/flysystem": "^0.0.0"
+    "@flysystem-ts/flysystem": "^0.0.0",
+    "googleapis": "^100.0.0"
   }
 }

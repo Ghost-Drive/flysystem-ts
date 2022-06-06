@@ -28,7 +28,8 @@
         "@typescript-eslint"
     ],
     "rules": {
-        "no-dupe-class-members": "off",
+        "camelcase": "off",
+        "no-useless-escape": "off",        "no-dupe-class-members": "off",
         "no-empty-pattern": "off",
         "indent": [
             "error",
