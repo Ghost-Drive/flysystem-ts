@@ -13,7 +13,9 @@
     "_3_1_install": "npx lerna add @flysystem-ts/common --scope=@flysystem-ts/flysystem",
     "_3_2_install": "npx lerna add @flysystem-ts/adapter-interface --scope=@flysystem-ts/flysystem",
     "_3_build": "npx lerna run build --scope=@flysystem-ts/flysystem",
-    "lerna:bootstrap": "npm run _1_install && npm run _1_build && npm run _2_install && npm run _2_build && npm run _3_1_install && npm run _3_2_install && npm run _3_build"
+    "_4_install": "npx lerna exec 'npm i' --scope=@flysystem/drop-box-adapter",
+    "_4_build": "npx lerna run build --scope=@flysystem/drop-box-adapter",
+    "lerna:bootstrap": "npm run _1_install && npm run _1_build && npm run _2_install && npm run _2_build && npm run _3_1_install && npm run _3_2_install && npm run _3_build && npm run _4_install && npm run _4_build"
   },
   "husky": {
     "hooks": {

@@ -1,0 +1,31 @@
+{
+  "name": "@flysystem/drop-box-adapter",
+  "version": "0.0.0",
+  "description": "> TODO: description",
+  "author": "nik-selecto <n.moiseienko@selectoglobal.com>",
+  "homepage": "https://github.com/Ghost-Drive/flysystem-ts#readme",
+  "license": "ISC",
+  "main": "dist/index.js",
+  "typings": "dist/index.d.ts",
+  "directories": {
+    "lib": "dist",
+    "test": "__tests__"
+  },
+  "files": [
+    "dist"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Ghost-Drive/flysystem-ts.git"
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "test": "echo \"Error: run tests from root\" && exit 1"
+  },
+  "bugs": {
+    "url": "https://github.com/Ghost-Drive/flysystem-ts/issues"
+  }
+}
