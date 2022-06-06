@@ -1,7 +1,7 @@
 {
-  "name": "@flysystem-ts/drop-box-adapter",
+  "name": "@flysystem-ts/google-drive-adapter",
   "version": "0.0.0",
-  "description": "Adapter for work with https://www.dropbox.com/home",
+  "description": "> TODO: description",
   "author": "nik-selecto <n.moiseienko@selectoglobal.com>",
   "homepage": "https://github.com/Ghost-Drive/flysystem-ts#readme",
   "license": "ISC",
@@ -28,16 +28,11 @@
   "bugs": {
     "url": "https://github.com/Ghost-Drive/flysystem-ts/issues"
   },
-  "devDependencies": {
-    "@flysystem-ts/adapter-interface": "^0.0.0",
-    "@flysystem-ts/common": "^0.0.0",
-    "@flysystem-ts/flysystem": "^0.0.0"
-  },
   "dependencies": {
     "@flysystem-ts/adapter-interface": "^0.0.0",
-    "@flysystem-ts/common": "^0.0.0",
-    "@flysystem-ts/flysystem": "^0.0.0",
-    "dropbox": "^10.30.0",
-    "moment": "^2.29.3"
+    "@flysystem-ts/common": "^0.0.0"
+  },
+  "devDependencies": {
+    "@flysystem-ts/flysystem": "^0.0.0"
   }
 }
