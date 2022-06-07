@@ -130,7 +130,7 @@ describe('GoogleDriveAdapter testing', () => {
     }, 1000 * 10);
 
     it('Should return empty array', async () => {
-        const res = await flysystem.listContents('B');
+        const res = await flysystem.listContents('EmptyFolder');
 
         log(res);
 
@@ -173,5 +173,11 @@ describe('GoogleDriveAdapter testing', () => {
         log(res);
 
         expect(res).toBe(isExists);
+    });
+
+    it('Should upload picture', async () => {
+        const res = await flysystem.writeStream('B/pic4.jpg', fs.createReadStream(join(__dirname, 'photo-for-test.jpg')));
+
+        log(res);
     });
 });

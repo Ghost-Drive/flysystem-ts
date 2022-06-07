@@ -1,4 +1,5 @@
 import { drive_v3 } from 'googleapis';
+import { Readable } from 'stream';
 import { FOLDER_MIME_TYPE } from './google-drive.constants';
 
 type VisibilityType = ` visibility = ${'"limited"'} `; // TODO complete
@@ -66,7 +67,7 @@ export class GoogleDriveApiExecutor {
         }).then(({ data: { nextPageToken, files = [] } }) => ({ nextPageToken, files }));
     }
 
-    simpleFilesCreate(parentId: string, name: string, body: string | Buffer) {
+    filesCreateFromStream(parentId: string, name: string, body: Readable) {
         return this.gDrive.files.create({
             requestBody: {
                 parents: [parentId],

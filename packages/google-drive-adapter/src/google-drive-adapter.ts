@@ -127,6 +127,10 @@ export class GoogleDriveAdapter implements IFlysystemAdapter {
     }
 
     async write(path: string, contents: string | Buffer, config?: VisibilityInterface | undefined): Promise<void> {
+        throw new Error('Method not implemented.');
+    }
+
+    async writeStream(path: string, resource: Readable, config?: VisibilityInterface | undefined): Promise<void> {
         const { folders, idPath, pathId } = await this.virtualPathMapper.virtualize();
         const _path = trimSlashes(path);
         const [fileName] = _path.match(/(?!\/)[^\/]+$/) || [];
@@ -139,11 +143,7 @@ export class GoogleDriveAdapter implements IFlysystemAdapter {
 
         await GoogleDriveApiExecutor
             .req(this.gDrive)
-            .simpleFilesCreate(folderId, fileName, contents);
-    }
-
-    writeStream(path: string, resource: Readable, config?: VisibilityInterface | undefined): Promise<void> {
-        throw new Error('Method not implemented.');
+            .filesCreateFromStream(folderId, fileName, resource);
     }
 
     read(path: string, config?: ReadFileOptionsInterface | undefined): Promise<string | Buffer> {
