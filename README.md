@@ -13,7 +13,7 @@ Its creation was inspired by great anaulog in PHP - [Flysystem](https://flysyste
 
 ## Adapters
 * [drop-box adapter](./packages/drop-box-adapter/README.md)
-* [google-drive adapter](#TODO)
+* [google-drive adapter](./packages/google-drive-adapter/README.md)
 * [local adapter](#TODO)
 
 #### [You also may create your own custom adapter](#TODO)
