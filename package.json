@@ -13,7 +13,17 @@
     "_3_1_install": "npx lerna add @flysystem-ts/common --scope=@flysystem-ts/flysystem",
     "_3_2_install": "npx lerna add @flysystem-ts/adapter-interface --scope=@flysystem-ts/flysystem",
     "_3_build": "npx lerna run build --scope=@flysystem-ts/flysystem",
-    "lerna:bootstrap": "npm run _1_install && npm run _1_build && npm run _2_install && npm run _2_build && npm run _3_1_install && npm run _3_2_install && npm run _3_build"
+    "_4_1_install": "npx lerna add @flysystem-ts/adapter-interface --scope=@flysystem-ts/drop-box-adapter",
+    "_4_2_install": "npx lerna add @flysystem-ts/common --scope=@flysystem-ts/drop-box-adapter",
+    "_4_3_install": "npx lerna add -D @flysystem-ts/flysystem --scope=@flysystem-ts/drop-box-adapter",
+    "_4_4_install": "npx lerna exec 'npm i' --scope=@flysystem-ts/drop-box-adapter",
+    "_4_build": "npx lerna run build --scope=@flysystem-ts/drop-box-adapter",
+    "_5_1_install": "npx lerna add @flysystem-ts/adapter-interface --scope=@flysystem-ts/google-drive-adapter",
+    "_5_2_install": "npx lerna add @flysystem-ts/common --scope=@flysystem-ts/google-drive-adapter",
+    "_5_3_install": "npx lerna add -D @flysystem-ts/flysystem --scope=@flysystem-ts/drop-box-adapter",
+    "5_4_install": "npx lerna exec 'npm i' --scope=@flysystem-ts/google-drive-adapter",
+    "_5_build": "npx lerna run build --scope=@flysystem-ts/google-drive-adapter",
+    "lerna:bootstrap": "npm run _1_install && npm run _1_build && npm run _2_install && npm run _2_build && npm run _3_1_install && npm run _3_2_install && npm run _3_build && npm run _4_1_install && npm run _4_2_install && npm run _4_3_install && npm run _4_build && npm run _5_1_install && npm run _5_2_install && npm run _5_3_install && npm run _5_build && npx lerna bootstrap"
   },
   "husky": {
     "hooks": {

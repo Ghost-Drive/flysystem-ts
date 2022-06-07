@@ -1,5 +1,5 @@
 {
-  "name": "@flysystem-ts/flysystem",
+  "name": "@flysystem-ts/google-drive-adapter",
   "version": "0.0.0",
   "description": "> TODO: description",
   "author": "nik-selecto <n.moiseienko@selectoglobal.com>",
@@ -28,14 +28,12 @@
   "bugs": {
     "url": "https://github.com/Ghost-Drive/flysystem-ts/issues"
   },
-  "devDependencies": {
-    "@flysystem-ts/adapter-interface": "^0.0.0",
-    "@flysystem-ts/common": "^0.0.0",
-    "@types/lodash": "^4.14.182",
-    "lodash": "^4.17.21"
-  },
   "dependencies": {
     "@flysystem-ts/adapter-interface": "^0.0.0",
     "@flysystem-ts/common": "^0.0.0"
+  },
+  "devDependencies": {
+    "@flysystem-ts/flysystem": "^0.0.0",
+    "googleapis": "^100.0.0"
   }
 }
