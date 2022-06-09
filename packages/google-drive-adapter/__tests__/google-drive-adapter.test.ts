@@ -3,10 +3,10 @@
 /* eslint-disable camelcase */
 import fs from 'fs';
 import { join } from 'path';
-import readline from 'readline';
 import { google, Auth } from 'googleapis';
 import { Flysystem } from '@flysystem-ts/flysystem';
 import { inspect } from 'util';
+import { config } from 'dotenv';
 import { GoogleDriveAdapter } from '../src';
 
 // eslint-disable-next-line no-console
@@ -25,7 +25,6 @@ const SCOPES = [
 // time.
 const TOKEN_PATH = 'token.json';
 let CREDENTIALS: CredentialsType | null = null;
-const WAIT_FRO_MANUAL_INPUT = 40 * 1000;
 
 async function _getAccessToken(oAuth2Client: OAuth2Client): Promise<OAuth2Client> {
     const authUrl = oAuth2Client.generateAuthUrl({
@@ -33,38 +32,33 @@ async function _getAccessToken(oAuth2Client: OAuth2Client): Promise<OAuth2Client
         scope: SCOPES,
     });
 
-    return new Promise<OAuth2Client>((resolve, reject) => {
-        const offError = setTimeout(() => {
-            reject(new Error('Unfortunately first time these tests need manual input! Retry again and be ready to follow console instructions.'));
-        }, WAIT_FRO_MANUAL_INPUT);
+    console.info('Authorize this app by visiting this url:', authUrl);
+    console.warn('You have 40 sec to paste code from this url to .test.env in GDRIVE_AUTH_CODE variable');
 
-        console.info('Authorize this app by visiting this url:', authUrl);
+    return new Promise<Auth.OAuth2Client>((resolve) => {
+        setTimeout(() => {
+            config({ path: join(__dirname, '../../..', '.test.env') });
 
-        const rl = readline.createInterface({
-            input: process.stdin,
-            output: process.stdout,
-        });
+            const { GDRIVE_AUTH_CODE: code } = process.env;
 
-        rl.question('Enter the code from that page here: ', (code) => {
-            rl.close();
-            clearTimeout(offError);
+            if (!code) {
+                throw new Error('GDRIVE_AUTH_CODE variable in .test.env is empty');
+            }
+
             oAuth2Client.getToken(code, (authError, token) => {
                 if (authError) {
                     console.error('Error retrieving access token', authError);
-                    reject(authError);
                 }
 
                 oAuth2Client.setCredentials(token!);
                 // Store the token to disk for later program executions
                 fs.writeFile(join(__dirname, '..', TOKEN_PATH), JSON.stringify(token), (fsError) => {
-                    if (fsError) reject(fsError);
-
                     console.info('Token stored to', TOKEN_PATH);
 
                     resolve(oAuth2Client);
                 });
             });
-        });
+        }, 30 * 1000);
     });
 }
 
@@ -109,7 +103,7 @@ describe('GoogleDriveAdapter testing', () => {
         flysystem = new Flysystem(
             new GoogleDriveAdapter(google.drive({ version: 'v3', auth })),
         );
-    }, WAIT_FRO_MANUAL_INPUT + 5 * 10000); // little more than input to give chance correct error appear in console in case of fail
+    }, 40 * 1000); // little more than input to give chance correct error appear in console in case of fail
 
     it('Should return full list of files', async () => {
         const res = await flysystem.listContents();
