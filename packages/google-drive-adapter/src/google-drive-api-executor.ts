@@ -78,4 +78,14 @@ export class GoogleDriveApiExecutor {
             },
         });
     }
+
+    filesCreateFolder(parentId: string, name: string) {
+        return this.gDrive.files.create({
+            requestBody: {
+                mimeType: FOLDER_MIME_TYPE,
+                name,
+                parents: [parentId],
+            },
+        });
+    }
 }
