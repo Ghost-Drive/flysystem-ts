@@ -88,4 +88,10 @@ export class GoogleDriveApiExecutor {
             },
         });
     }
+
+    filesDelete(fileId: string) {
+        return this.gDrive.files.delete({
+            fileId,
+        });
+    }
 }

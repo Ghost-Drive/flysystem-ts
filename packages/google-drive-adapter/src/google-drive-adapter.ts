@@ -165,14 +165,16 @@ export class GoogleDriveAdapter implements IFlysystemAdapter {
         throw new Error('Method not implemented.');
     }
 
-    deleteDirectory(path: string): Promise<void> {
-        throw new Error('Method not implemented.');
+    async deleteDirectory(path: string): Promise<void> {
+        const { folderId } = await this.explorePath(path, true);
+
+        await GoogleDriveApiExecutor.req(this.gDrive).filesDelete(folderId);
     }
 
     async createDirectory(path: string, config?: VisibilityInterface | undefined): Promise<void> {
         const _path = trimSlashes(path);
         const upFolder = _path.slice(0, _path.lastIndexOf('/'));
-        const folder = _path.slice(upFolder.length);
+        const folder = _path.slice(upFolder.length + 1);
         const { pathId } = await this.virtualPathMapper.virtualize();
         const parentId = pathId.get(upFolder);
 
@@ -207,11 +209,15 @@ export class GoogleDriveAdapter implements IFlysystemAdapter {
         throw new Error('Method not implemented.');
     }
 
-    private async explorePath(path: string): Promise<{ folderId: string, folderPath: string, fileName?: string, folders: string[], idPath: Map<string, string>, pathId: Map<string, string>, trimedPath: string }> {
+    private async explorePath(path: string, isFolder = false): Promise<{ folderId: string, folderPath: string, fileName?: string, folders: string[], idPath: Map<string, string>, pathId: Map<string, string>, trimedPath: string }> {
         const { folders, idPath, pathId } = await this.virtualPathMapper.virtualize();
         const trimedPath = trimSlashes(path);
-        const [fileName] = trimedPath.match(/(?!\/)[^\/]+$/) || [];
-        const folderPath = trimedPath.slice(0, path.lastIndexOf(fileName));
+        const [fileName] = isFolder
+            ? [undefined]
+            : trimedPath.match(/(?!\/)[^\/]+$/) || [];
+        const folderPath = isFolder
+            ? trimedPath
+            : trimedPath.slice(0, path.lastIndexOf(fileName!));
         const folderId = pathId.get(folderPath);
 
         if (!folderId) {
