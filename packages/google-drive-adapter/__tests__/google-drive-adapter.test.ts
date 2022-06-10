@@ -19,6 +19,7 @@ type OAuth2Client = Auth.OAuth2Client;
 const SCOPES = [
     'https://www.googleapis.com/auth/drive.metadata.readonly',
     'https://www.googleapis.com/auth/drive.file',
+    'https://www.googleapis.com/auth/drive',
 ];
 // The file token.json stores the user's access and refresh tokens, and is
 // created automatically when the authorization flow completes for the first
@@ -58,7 +59,7 @@ async function _getAccessToken(oAuth2Client: OAuth2Client): Promise<OAuth2Client
                     resolve(oAuth2Client);
                 });
             });
-        }, 30 * 1000);
+        }, 2000);
     });
 }
 
@@ -103,7 +104,7 @@ describe('GoogleDriveAdapter testing', () => {
         flysystem = new Flysystem(
             new GoogleDriveAdapter(google.drive({ version: 'v3', auth })),
         );
-    }, 40 * 1000); // little more than input to give chance correct error appear in console in case of fail
+    }, 3000); // little more than input to give chance correct error appear in console in case of fail
 
     it('Should return full list of files', async () => {
         const res = await flysystem.listContents();
@@ -161,7 +162,7 @@ describe('GoogleDriveAdapter testing', () => {
     it.each([
         { path: 'A/AA3', isExists: true },
         { path: 'N/O/S/U/C/H/F/O/L/D/E/R', isExists: false },
-    ])('Should return true because directory exist', async ({ path, isExists }) => {
+    ])('Should return is directory exist', async ({ path, isExists }) => {
         const res = await flysystem.directoryExists(path);
 
         log(res);
@@ -170,8 +171,33 @@ describe('GoogleDriveAdapter testing', () => {
     });
 
     it('Should upload picture', async () => {
-        const res = await flysystem.writeStream('B/pic4.jpg', fs.createReadStream(join(__dirname, 'photo-for-test.jpg')));
+        const picName = `pic-${new Date().getTime()}-test.jpg`;
+        const path = `B/${picName}`;
 
-        log(res);
+        await flysystem.writeStream(path, fs.createReadStream(join(__dirname, 'photo-for-test.jpg')));
+
+        expect(await flysystem.fileExists(path)).toBe(true);
+    });
+
+    it.only('Should create directory', async () => {
+        const folderName = `new-folder-${new Date().getTime()}-test`;
+        const path = `A/${folderName}`;
+
+        await flysystem.createDirectory(path);
+
+        expect(await flysystem.directoryExists(path)).toBe(true);
+    });
+
+    it.only('Should remove directory', async () => {
+        const folderName = `new-folder-${new Date().getTime()}-test`;
+        const path = `A/${folderName}`;
+
+        await flysystem.createDirectory(path);
+
+        expect(await flysystem.directoryExists(path)).toBe(true);
+
+        await flysystem.deleteDirectory(path);
+
+        expect(await flysystem.directoryExists(path)).toBe(false);
     });
 });

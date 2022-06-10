@@ -2,7 +2,7 @@
 /* eslint-disable no-unused-vars */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import {
-    FileAttributes, FileTypeEnum, VisibilityInterface, ReadFileOptionsInterface, IStorageAttributes, PathPrefixer, RequirePart, VisibilityEnum,
+    FileAttributes, FileTypeEnum, VisibilityInterface, ReadFileOptionsInterface, IStorageAttributes, PathPrefixer, RequirePart, VisibilityEnum, DirectoryAttributes,
 } from '@flysystem-ts/common';
 import { IFlysystemAdapter } from '@flysystem-ts/adapter-interface';
 import fs, { ReadStream } from 'fs';
@@ -19,20 +19,22 @@ function trimSlashes(str: string) {
 export class GoogleDriveAdapter implements IFlysystemAdapter {
     private virtualPathMapper!: VirtualPathMapper;
 
+    private prefixer!: PathPrefixer;
+
     constructor(
         private gDrive: drive_v3.Drive,
     ) {
         this.virtualPathMapper = new VirtualPathMapper(gDrive);
+        this.prefixer = new PathPrefixer('');
     }
 
     async listContents(path: string, deep: boolean): Promise<IStorageAttributes[]> {
-        const res = await this.virtualPathMapper.virtualize();
-        const { folders, idPath, pathId } = res;
-        const _path = trimSlashes(path);
-        const folderId = pathId.get(_path);
+        const {
+            folderId, folders, trimedPath, pathId, idPath,
+        } = await this.explorePath(path);
 
         if (!folderId) {
-            throw new Error(`Any directory by such path "${path}" (interpreted as "${_path}").`);
+            throw new Error(`Any directory by such path "${path}" (interpreted as "${trimedPath}").`);
         }
 
         const options: FileListOptionsType = {
@@ -41,7 +43,7 @@ export class GoogleDriveAdapter implements IFlysystemAdapter {
 
         if (deep) {
             const matchedFolders = folders.reduce((acc, pathToFolder) => {
-                if (pathToFolder.indexOf(_path) === 0) {
+                if (pathToFolder.indexOf(trimedPath) === 0) {
                     acc.push(`"${pathId.get(pathToFolder)}" in parents`);
                 }
 
@@ -66,26 +68,35 @@ export class GoogleDriveAdapter implements IFlysystemAdapter {
             const lastModified = file.modifiedTime
                 ? new Date(file.modifiedTime).getTime()
                 : undefined;
-            // TODO concrete types
+
+            if (isDir) {
+                return {
+                    isDir,
+                    isFile,
+                    path: idPath.get(file.id!),
+                    type,
+                    lastModified,
+                    visibility: (file.copyRequiresWriterPermission ?? false)
+                        ? VisibilityEnum.PRIVATE
+                        : VisibilityEnum.PUBLIC,
+                } as DirectoryAttributes;
+            }
+
             return {
+                fileSize: parseFloat(file.size!),
                 isDir,
                 isFile,
                 type,
-                path: idPath.get(file.id!) || `${idPath.get(String(file.parents?.at(-1)))}/${file.name}`,
+                path: `${idPath.get(String(file.parents?.at(-1)))}/${file.name}`,
                 lastModified,
-                size: file.size ? parseFloat(file.size!) : undefined,
                 visibility: file.copyRequiresWriterPermission ?? false ? VisibilityEnum.PRIVATE : VisibilityEnum.PUBLIC,
-            };
+            } as FileAttributes;
         });
     }
 
     // TODO What we should do, if the file name will contains "/" character???
     async fileExists(path: string): Promise<boolean> {
-        const { folders, idPath, pathId } = await this.virtualPathMapper.virtualize();
-        const _path = trimSlashes(path);
-        const [fileName] = _path.match(/(?!\/)[^\/]+$/) || [];
-        const folderPath = _path.slice(0, path.lastIndexOf(fileName));
-        const folderId = pathId.get(folderPath);
+        const { folderId, fileName, folderPath } = await this.explorePath(path);
 
         if (!folderId) {
             throw new Error(`Any directory by such path "${path}" (interpreted as "${folderPath}").`);
@@ -116,7 +127,7 @@ export class GoogleDriveAdapter implements IFlysystemAdapter {
     }
 
     getPathPrefix(): PathPrefixer {
-        throw new Error('Method not implemented.');
+        return this.prefixer;
     }
 
     async directoryExists(path: string): Promise<boolean> {
@@ -131,11 +142,7 @@ export class GoogleDriveAdapter implements IFlysystemAdapter {
     }
 
     async writeStream(path: string, resource: Readable, config?: VisibilityInterface | undefined): Promise<void> {
-        const { folders, idPath, pathId } = await this.virtualPathMapper.virtualize();
-        const _path = trimSlashes(path);
-        const [fileName] = _path.match(/(?!\/)[^\/]+$/) || [];
-        const folderPath = _path.slice(0, path.lastIndexOf(fileName));
-        const folderId = pathId.get(folderPath);
+        const { folderId, folderPath, fileName } = await this.explorePath(path);
 
         if (!folderId) {
             throw new Error(`Any directory by such path "${path}" (interpreted as "${folderPath}").`);
@@ -143,7 +150,7 @@ export class GoogleDriveAdapter implements IFlysystemAdapter {
 
         await GoogleDriveApiExecutor
             .req(this.gDrive)
-            .filesCreateFromStream(folderId, fileName, resource);
+            .filesCreateFromStream(folderId, fileName!, resource);
     }
 
     read(path: string, config?: ReadFileOptionsInterface | undefined): Promise<string | Buffer> {
@@ -158,12 +165,20 @@ export class GoogleDriveAdapter implements IFlysystemAdapter {
         throw new Error('Method not implemented.');
     }
 
-    deleteDirectory(path: string): Promise<void> {
-        throw new Error('Method not implemented.');
+    async deleteDirectory(path: string): Promise<void> {
+        const { folderId } = await this.explorePath(path, true);
+
+        await GoogleDriveApiExecutor.req(this.gDrive).filesDelete(folderId);
     }
 
-    createDirectory(path: string, config?: VisibilityInterface | undefined): Promise<void> {
-        throw new Error('Method not implemented.');
+    async createDirectory(path: string, config?: VisibilityInterface | undefined): Promise<void> {
+        const _path = trimSlashes(path);
+        const upFolder = _path.slice(0, _path.lastIndexOf('/'));
+        const folder = _path.slice(upFolder.length + 1);
+        const { pathId } = await this.virtualPathMapper.virtualize();
+        const parentId = pathId.get(upFolder);
+
+        await GoogleDriveApiExecutor.req(this.gDrive).filesCreateFolder(parentId!, folder);
     }
 
     setVisibility(path: string, visibility: VisibilityEnum): Promise<void> {
@@ -192,5 +207,25 @@ export class GoogleDriveAdapter implements IFlysystemAdapter {
 
     copy(source: string, destination: string, config?: Record<string, any> | undefined): Promise<void> {
         throw new Error('Method not implemented.');
+    }
+
+    private async explorePath(path: string, isFolder = false): Promise<{ folderId: string, folderPath: string, fileName?: string, folders: string[], idPath: Map<string, string>, pathId: Map<string, string>, trimedPath: string }> {
+        const { folders, idPath, pathId } = await this.virtualPathMapper.virtualize();
+        const trimedPath = trimSlashes(path);
+        const [fileName] = isFolder
+            ? [undefined]
+            : trimedPath.match(/(?!\/)[^\/]+$/) || [];
+        const folderPath = isFolder
+            ? trimedPath
+            : trimedPath.slice(0, path.lastIndexOf(fileName!));
+        const folderId = pathId.get(folderPath);
+
+        if (!folderId) {
+            throw new Error(`Any directory by such path "${path}" (interpreted as "${folderPath}").`);
+        }
+
+        return {
+            folderId, fileName, folderPath, folders, idPath, pathId, trimedPath,
+        };
     }
 }
