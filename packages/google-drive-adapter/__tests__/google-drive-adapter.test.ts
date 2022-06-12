@@ -34,7 +34,7 @@ async function _getAccessToken(oAuth2Client: OAuth2Client): Promise<OAuth2Client
     });
 
     console.info('Authorize this app by visiting this url:', authUrl);
-    console.warn('You have 40 sec to paste code from this url to .test.env in GDRIVE_AUTH_CODE variable');
+    console.warn('Paste code from this url to .test.env in GDRIVE_AUTH_CODE variable and run tests again');
 
     return new Promise<Auth.OAuth2Client>((resolve) => {
         setTimeout(() => {
@@ -179,7 +179,7 @@ describe('GoogleDriveAdapter testing', () => {
         expect(await flysystem.fileExists(path)).toBe(true);
     });
 
-    it.only('Should create directory', async () => {
+    it('Should create directory', async () => {
         const folderName = `new-folder-${new Date().getTime()}-test`;
         const path = `A/${folderName}`;
 
@@ -188,7 +188,7 @@ describe('GoogleDriveAdapter testing', () => {
         expect(await flysystem.directoryExists(path)).toBe(true);
     });
 
-    it.only('Should remove directory', async () => {
+    it('Should remove directory', async () => {
         const folderName = `new-folder-${new Date().getTime()}-test`;
         const path = `A/${folderName}`;
 
