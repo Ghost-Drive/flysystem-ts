@@ -31,7 +31,7 @@ export class GoogleDriveAdapter implements IFlysystemAdapter {
     async listContents(path: string, deep: boolean): Promise<IStorageAttributes[]> {
         const {
             folderId, folders, trimedPath, pathId, idPath,
-        } = await this.explorePath(path);
+        } = await this.explorePath(path, true);
 
         if (!folderId) {
             throw new Error(`Any directory by such path "${path}" (interpreted as "${trimedPath}").`);
@@ -97,11 +97,6 @@ export class GoogleDriveAdapter implements IFlysystemAdapter {
     // TODO What we should do, if the file name will contains "/" character???
     async fileExists(path: string): Promise<boolean> {
         const { folderId, fileName, folderPath } = await this.explorePath(path);
-
-        if (!folderId) {
-            throw new Error(`Any directory by such path "${path}" (interpreted as "${folderPath}").`);
-        }
-
         let nextPageToken: string | null | undefined;
         let exists = false;
 
@@ -138,15 +133,15 @@ export class GoogleDriveAdapter implements IFlysystemAdapter {
     }
 
     async write(path: string, contents: string | Buffer, config?: VisibilityInterface | undefined): Promise<void> {
-        throw new Error('Method not implemented.');
+        const { folderId, folderPath, fileName } = await this.explorePath(path);
+
+        await GoogleDriveApiExecutor
+            .req(this.gDrive)
+            .filesCreateFromStream(folderId, fileName!, Readable.from(contents));
     }
 
     async writeStream(path: string, resource: Readable, config?: VisibilityInterface | undefined): Promise<void> {
         const { folderId, folderPath, fileName } = await this.explorePath(path);
-
-        if (!folderId) {
-            throw new Error(`Any directory by such path "${path}" (interpreted as "${folderPath}").`);
-        }
 
         await GoogleDriveApiExecutor
             .req(this.gDrive)

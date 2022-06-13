@@ -26,6 +26,7 @@ const SCOPES = [
 // time.
 const TOKEN_PATH = 'token.json';
 let CREDENTIALS: CredentialsType | null = null;
+const TEST_PIC_PATH = join(__dirname, '../../resourses', 'photo-for-test.jpg');
 
 async function _getAccessToken(oAuth2Client: OAuth2Client): Promise<OAuth2Client> {
     const authUrl = oAuth2Client.generateAuthUrl({
@@ -160,7 +161,7 @@ describe('GoogleDriveAdapter testing', () => {
     }, 1000 * 10);
 
     it.each([
-        { path: 'A/AA3', isExists: true },
+        { path: 'C/CC/CCC', isExists: true },
         { path: 'N/O/S/U/C/H/F/O/L/D/E/R', isExists: false },
     ])('Should return is directory exist', async ({ path, isExists }) => {
         const res = await flysystem.directoryExists(path);
@@ -170,11 +171,20 @@ describe('GoogleDriveAdapter testing', () => {
         expect(res).toBe(isExists);
     });
 
-    it('Should upload picture', async () => {
+    it('Should upload picture (stream)', async () => {
         const picName = `pic-${new Date().getTime()}-test.jpg`;
         const path = `B/${picName}`;
 
-        await flysystem.writeStream(path, fs.createReadStream(join(__dirname, 'photo-for-test.jpg')));
+        await flysystem.writeStream(path, fs.createReadStream(TEST_PIC_PATH));
+
+        expect(await flysystem.fileExists(path)).toBe(true);
+    });
+
+    it('Should upload picture (buffer)', async () => {
+        const picName = `pic-${new Date().getTime()}-test.jpg`;
+        const path = `B/${picName}`;
+
+        await flysystem.write(path, fs.readFileSync(TEST_PIC_PATH));
 
         expect(await flysystem.fileExists(path)).toBe(true);
     });
