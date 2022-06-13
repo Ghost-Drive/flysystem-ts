@@ -7,7 +7,7 @@ import {
 import { IFlysystemAdapter } from '@flysystem-ts/adapter-interface';
 import fs, { ReadStream } from 'fs';
 import { Readable } from 'stream';
-import { drive_v3 } from 'googleapis';
+import { drive_v3, jobs_v3 } from 'googleapis';
 import { inspect } from 'util';
 import { VirtualPathMapper } from './virtual-path-mapper';
 import { FileListOptionsType, GoogleDriveApiExecutor } from './google-drive-api-executor';
@@ -148,8 +148,38 @@ export class GoogleDriveAdapter implements IFlysystemAdapter {
             .filesCreateFromStream(folderId, fileName!, resource);
     }
 
-    read(path: string, config?: ReadFileOptionsInterface | undefined): Promise<string | Buffer> {
-        throw new Error('Method not implemented.');
+    async read(path: string, config?: ReadFileOptionsInterface | undefined): Promise<string | Buffer> {
+        const {
+            trimedPath, folderId, fileName, folderPath,
+        } = await this.explorePath(path);
+        let nextPageToken: string | null | undefined;
+        let needle: drive_v3.Schema$File | undefined;
+
+        do {
+            // eslint-disable-next-line no-await-in-loop
+            const res = await GoogleDriveApiExecutor
+                .req(this.gDrive)
+                .filesList({
+                    inWhichFolderOnly: ` and "${folderId}" in parents `,
+                    fields: ['nextPageToken'],
+                    fieldsInFile: ['name', 'id'],
+                });
+
+            needle = res.files.find((f) => f.name! === fileName);
+            nextPageToken = res.nextPageToken;
+
+            if (needle) {
+                break;
+            }
+        } while (nextPageToken);
+
+        if (!needle) {
+            throw new Error(`Any files by this path ("${path}" interpreted as "${trimedPath})`);
+        }
+
+        return GoogleDriveApiExecutor
+            .req(this.gDrive)
+            .filesGet(needle.id!) as Promise<Buffer>;
     }
 
     readStream(path: string, config?: Record<string, any> | undefined): Promise<ReadStream> {

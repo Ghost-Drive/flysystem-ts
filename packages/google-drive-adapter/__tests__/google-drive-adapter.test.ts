@@ -210,4 +210,15 @@ describe('GoogleDriveAdapter testing', () => {
 
         expect(await flysystem.directoryExists(path)).toBe(false);
     });
+
+    it('Should download file', async () => {
+        const res = await flysystem.read('/A/random.pdf');
+        const pathToDownload = join(__dirname, 'downloaded.pdf');
+
+        fs.writeFileSync(pathToDownload, res);
+
+        expect(fs.existsSync(pathToDownload)).toBe(true);
+
+        fs.rmSync(pathToDownload);
+    });
 });
