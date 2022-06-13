@@ -1,5 +1,7 @@
 import { drive_v3 } from 'googleapis';
 import { Readable } from 'stream';
+// eslint-disable-next-line @typescript-eslint/no-unused-vars, no-unused-vars
+import { inspect } from 'util';
 import { FOLDER_MIME_TYPE } from './google-drive.constants';
 
 type VisibilityType = ` visibility = ${'"limited"'} `; // TODO complete
@@ -93,5 +95,16 @@ export class GoogleDriveApiExecutor {
         return this.gDrive.files.delete({
             fileId,
         });
+    }
+
+    async filesGet(fileId: string) {
+        const res = await this.gDrive.files.get({
+            fileId,
+            alt: 'media',
+        }, {
+            responseType: 'arraybuffer',
+        });
+
+        return Buffer.from(res.data as any);
     }
 }

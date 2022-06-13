@@ -7,7 +7,7 @@ import {
 import { IFlysystemAdapter } from '@flysystem-ts/adapter-interface';
 import fs, { ReadStream } from 'fs';
 import { Readable } from 'stream';
-import { drive_v3 } from 'googleapis';
+import { drive_v3, jobs_v3 } from 'googleapis';
 import { inspect } from 'util';
 import { VirtualPathMapper } from './virtual-path-mapper';
 import { FileListOptionsType, GoogleDriveApiExecutor } from './google-drive-api-executor';
@@ -31,7 +31,7 @@ export class GoogleDriveAdapter implements IFlysystemAdapter {
     async listContents(path: string, deep: boolean): Promise<IStorageAttributes[]> {
         const {
             folderId, folders, trimedPath, pathId, idPath,
-        } = await this.explorePath(path);
+        } = await this.explorePath(path, true);
 
         if (!folderId) {
             throw new Error(`Any directory by such path "${path}" (interpreted as "${trimedPath}").`);
@@ -97,11 +97,6 @@ export class GoogleDriveAdapter implements IFlysystemAdapter {
     // TODO What we should do, if the file name will contains "/" character???
     async fileExists(path: string): Promise<boolean> {
         const { folderId, fileName, folderPath } = await this.explorePath(path);
-
-        if (!folderId) {
-            throw new Error(`Any directory by such path "${path}" (interpreted as "${folderPath}").`);
-        }
-
         let nextPageToken: string | null | undefined;
         let exists = false;
 
@@ -138,23 +133,53 @@ export class GoogleDriveAdapter implements IFlysystemAdapter {
     }
 
     async write(path: string, contents: string | Buffer, config?: VisibilityInterface | undefined): Promise<void> {
-        throw new Error('Method not implemented.');
+        const { folderId, folderPath, fileName } = await this.explorePath(path);
+
+        await GoogleDriveApiExecutor
+            .req(this.gDrive)
+            .filesCreateFromStream(folderId, fileName!, Readable.from(contents));
     }
 
     async writeStream(path: string, resource: Readable, config?: VisibilityInterface | undefined): Promise<void> {
         const { folderId, folderPath, fileName } = await this.explorePath(path);
-
-        if (!folderId) {
-            throw new Error(`Any directory by such path "${path}" (interpreted as "${folderPath}").`);
-        }
 
         await GoogleDriveApiExecutor
             .req(this.gDrive)
             .filesCreateFromStream(folderId, fileName!, resource);
     }
 
-    read(path: string, config?: ReadFileOptionsInterface | undefined): Promise<string | Buffer> {
-        throw new Error('Method not implemented.');
+    async read(path: string, config?: ReadFileOptionsInterface | undefined): Promise<string | Buffer> {
+        const {
+            trimedPath, folderId, fileName, folderPath,
+        } = await this.explorePath(path);
+        let nextPageToken: string | null | undefined;
+        let needle: drive_v3.Schema$File | undefined;
+
+        do {
+            // eslint-disable-next-line no-await-in-loop
+            const res = await GoogleDriveApiExecutor
+                .req(this.gDrive)
+                .filesList({
+                    inWhichFolderOnly: ` and "${folderId}" in parents `,
+                    fields: ['nextPageToken'],
+                    fieldsInFile: ['name', 'id'],
+                });
+
+            needle = res.files.find((f) => f.name! === fileName);
+            nextPageToken = res.nextPageToken;
+
+            if (needle) {
+                break;
+            }
+        } while (nextPageToken);
+
+        if (!needle) {
+            throw new Error(`Any files by this path ("${path}" interpreted as "${trimedPath})`);
+        }
+
+        return GoogleDriveApiExecutor
+            .req(this.gDrive)
+            .filesGet(needle.id!) as Promise<Buffer>;
     }
 
     readStream(path: string, config?: Record<string, any> | undefined): Promise<ReadStream> {
