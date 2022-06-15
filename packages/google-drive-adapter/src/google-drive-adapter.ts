@@ -255,4 +255,4 @@ export class GoogleDriveAdapter implements IFlysystemAdapter {
     }
 }
 
-export const GDriveOauth = google.auth.OAuth2;
+export * from 'googleapis';
