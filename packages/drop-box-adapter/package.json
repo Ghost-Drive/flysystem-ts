@@ -1,6 +1,6 @@
 {
   "name": "@flysystem-ts/drop-box-adapter",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "Adapter for work with https://www.dropbox.com/home",
   "author": "nik-selecto <n.moiseienko@selectoglobal.com>",
   "homepage": "https://github.com/Ghost-Drive/flysystem-ts#readme",
@@ -34,9 +34,9 @@
     "@flysystem-ts/flysystem": "^0.1.0"
   },
   "dependencies": {
-    "@flysystem-ts/adapter-interface": "^0.1.1",
-    "@flysystem-ts/common": "^0.1.1",
-    "@flysystem-ts/flysystem": "^0.1.1",
+    "@flysystem-ts/adapter-interface": "^0.1.2",
+    "@flysystem-ts/common": "^0.1.2",
+    "@flysystem-ts/flysystem": "^0.1.2",
     "dropbox": "^10.30.0",
     "moment": "^2.29.3"
   }
