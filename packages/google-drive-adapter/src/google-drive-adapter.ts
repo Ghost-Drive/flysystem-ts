@@ -7,7 +7,7 @@ import {
 import { IFlysystemAdapter } from '@flysystem-ts/adapter-interface';
 import fs, { ReadStream } from 'fs';
 import { Readable } from 'stream';
-import { drive_v3, jobs_v3 } from 'googleapis';
+import { drive_v3, google, jobs_v3 } from 'googleapis';
 import { inspect } from 'util';
 import { VirtualPathMapper } from './virtual-path-mapper';
 import { FileListOptionsType, GoogleDriveApiExecutor } from './google-drive-api-executor';
@@ -254,3 +254,5 @@ export class GoogleDriveAdapter implements IFlysystemAdapter {
         };
     }
 }
+
+export const GDriveOauth = google.auth.OAuth2;
