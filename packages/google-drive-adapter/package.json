@@ -30,11 +30,11 @@
   },
   "dependencies": {
     "@flysystem-ts/adapter-interface": "^0.1.3",
-    "@flysystem-ts/common": "^0.1.3"
+    "@flysystem-ts/common": "^0.1.3",
+    "googleapis": "^100.0.0"
   },
   "devDependencies": {
     "@flysystem-ts/flysystem": "^0.1.3",
-    "dotenv": "^16.0.1",
-    "googleapis": "^100.0.0"
+    "dotenv": "^16.0.1"
   }
 }
