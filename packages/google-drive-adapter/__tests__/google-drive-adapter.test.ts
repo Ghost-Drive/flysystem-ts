@@ -209,7 +209,7 @@ describe('GoogleDriveAdapter testing', () => {
         await flysystem.deleteDirectory(path);
 
         expect(await flysystem.directoryExists(path)).toBe(false);
-    });
+    }, 10_000);
 
     it('Should download file', async () => {
         const res = await flysystem.read('/A/random.pdf');
