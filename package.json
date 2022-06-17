@@ -12,7 +12,7 @@
     "_2_install": "npx lerna add @flysystem-ts/common --scope=@flysystem-ts/adapter-interface && npx lerna exec 'npm i' --scope=@flysystem-ts/adapter-interface",
     "_2_build": "npx lerna run build --scope=@flysystem-ts/adapter-interface",
     "_3_1_install": "npx lerna add @flysystem-ts/common --scope=@flysystem-ts/flysystem",
-    "_3_2_install": "npx lerna add @flysystem-ts/adapter-interface --scope=@flysystem-ts/flysystem",
+    "_3_2_install": "npx lerna add @flysystem-ts/adapter-interface --scope=@flysystem-ts/flysystem && npx lerna exec 'npm i' --scope=@flysystem-ts/flysystem",
     "_3_build": "npx lerna run build --scope=@flysystem-ts/flysystem",
     "_4_1_install": "npx lerna add @flysystem-ts/adapter-interface --scope=@flysystem-ts/drop-box-adapter",
     "_4_2_install": "npx lerna add @flysystem-ts/common --scope=@flysystem-ts/drop-box-adapter",
