@@ -32,7 +32,7 @@
     "@types/lodash": "^4.14.182",
     "lodash": "^4.17.21"
   },
-  "gitHead": "48e637e402db50bc115c87a2de4ed87810575c5c",
+  "gitHead": "e6ffce50f001c318e3d3a19262d741e0c0ebb0e6",
   "dependencies": {
     "@flysystem-ts/adapter-interface": "^0.1.7",
     "@flysystem-ts/common": "^0.1.7"
