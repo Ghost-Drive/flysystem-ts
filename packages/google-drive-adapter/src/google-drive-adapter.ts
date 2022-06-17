@@ -254,5 +254,3 @@ export class GoogleDriveAdapter implements IFlysystemAdapter {
         };
     }
 }
-
-export * from 'googleapis';
