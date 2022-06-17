@@ -30,5 +30,6 @@
   },
   "devDependencies": {
     "@flysystem-ts/common": "^0.1.5"
-  }
+  },
+  "gitHead": "a03b74a7292de76804bbc29302958b5f586e38d0"
 }

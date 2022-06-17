@@ -5,7 +5,7 @@
 ## Usage
 
 ```
-const flysystem = require('@flysystem-ts/flysystem');
+import { flysystem } from '@flysystem-ts/flysystem';
 
 // TODO: DEMONSTRATE API
 ```
