@@ -34,8 +34,7 @@
     "googleapis": "^100.0.0"
   },
   "devDependencies": {
-    "@flysystem-ts/flysystem": "^0.1.6",
     "dotenv": "^16.0.1"
   },
-  "gitHead": "a03b74a7292de76804bbc29302958b5f586e38d0"
+  "gitHead": "48e637e402db50bc115c87a2de4ed87810575c5c"
 }
