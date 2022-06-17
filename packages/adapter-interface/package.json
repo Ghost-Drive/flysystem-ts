@@ -1,6 +1,6 @@
 {
   "name": "@flysystem-ts/adapter-interface",
-  "version": "0.1.6",
+  "version": "0.1.7",
   "description": "> TODO: description",
   "author": "nik-selecto <n.moiseienko@selectoglobal.com>",
   "homepage": "https://github.com/Ghost-Drive/flysystem-ts#readme",
@@ -30,6 +30,6 @@
   },
   "gitHead": "48e637e402db50bc115c87a2de4ed87810575c5c",
   "dependencies": {
-    "@flysystem-ts/common": "^0.1.6"
+    "@flysystem-ts/common": "^0.1.7"
   }
 }
