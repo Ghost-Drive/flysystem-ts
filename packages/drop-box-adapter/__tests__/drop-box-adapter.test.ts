@@ -3,9 +3,15 @@ import { config } from 'dotenv';
 import { Flysystem } from '@flysystem-ts/flysystem';
 import * as fs from 'fs';
 import { join } from 'path';
+import { inspect } from 'util';
 import { DropboxAdapter } from '../src/index';
 
 config({ path: '../../../.test.env' });
+
+config({ path: join(__dirname, '../../..', '.test.env') });
+
+const { DEBUG: LOG_MODE } = process.env;
+const log = (...args: any[]) => args.forEach((a) => (LOG_MODE === 'debug' ? console.info(inspect(a, { colors: true, depth: null })) : {}));
 
 const TEST_PIC_NAME = 'photo-for-test.jpg';
 const TEST_PIC_PATH = join(__dirname, '../resourses', TEST_PIC_NAME);
@@ -23,6 +29,14 @@ describe('Drop-box-adapter package testing', () => {
 
     it('Should return list of files', async () => {
         const res = await flysystem.listContents();
+
+        expect(res).toBeInstanceOf(Array);
+    });
+
+    it('Should return only files from "animals" folder', async () => {
+        const res = await flysystem.listContents('/animals');
+
+        log(res);
 
         expect(res).toBeInstanceOf(Array);
     });

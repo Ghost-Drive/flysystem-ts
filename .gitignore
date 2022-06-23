@@ -5,3 +5,5 @@ dist
 .env
 
 lerna-debug.log
+
+.idea

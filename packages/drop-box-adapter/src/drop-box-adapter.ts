@@ -44,7 +44,9 @@ export class DropboxAdapter implements IFlysystemAdapter {
     }
 
     protected applyPathPrefix(path: string): string {
-        return `/${this.prefixer.prefixPath(path).replace(/^\//, '').replace(/$\//, '')}`;
+        return path
+            ? `/${this.prefixer.prefixPath(path).replace(/^\//, '').replace(/$\//, '')}`
+            : '';
     }
 
     writeStream(path: string, resource: Readable, config?: VisibilityInterface | undefined): Promise<void> {
@@ -81,7 +83,7 @@ export class DropboxAdapter implements IFlysystemAdapter {
     }
 
     async listContents(path: string, deep: boolean): Promise<IStorageAttributes[]> {
-        const { headers, status, result: { entries } } = await this.dbx.filesListFolder({ path, recursive: deep });
+        const { headers, status, result: { entries } } = await this.dbx.filesListFolder({ path: this.applyPathPrefix(path), recursive: deep });
 
         return entries.reduce((acc, item) => {
             if (item['.tag'] === 'deleted') return acc;
