@@ -1,6 +1,6 @@
 {
   "name": "@flysystem-ts/drop-box-adapter",
-  "version": "0.2.2",
+  "version": "0.2.3",
   "description": "Adapter for work with https://www.dropbox.com/home",
   "author": "nik-selecto <n.moiseienko@selectoglobal.com>",
   "homepage": "https://github.com/Ghost-Drive/flysystem-ts#readme",
