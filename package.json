@@ -24,8 +24,7 @@
     "_5_3_install": "npx lerna add -D @flysystem-ts/flysystem --scope=@flysystem-ts/google-drive-adapter",
     "_5_4_install": "npx lerna exec 'npm i' --scope=@flysystem-ts/google-drive-adapter",
     "_5_build": "npx lerna run build --scope=@flysystem-ts/google-drive-adapter",
-    "lerna:bootstrap": "npm run _0_uninstall && npm run _1_install && npm run _1_build && npm run _2_install && npm run _2_build && npm run _3_1_install && npm run _3_2_install && npm run _3_build && npm run _4_1_install && npm run _4_2_install && npm run _4_3_install && npm run _4_build && npm run _5_1_install && npm run _5_2_install && npm run _5_3_install && npm run _5_4_install && npm run _5_build && npx lerna bootstrap",
-    "publish": "npm run lerna:bootstrap && npx lerna publish"
+    "lerna:bootstrap": "npx ts-node lerna-bootstrap.ts"
   },
   "husky": {
     "hooks": {
@@ -55,7 +54,7 @@
     "jest": "^28.1.0",
     "lerna": "^5.1.4",
     "ts-jest": "^28.0.4",
-    "ts-node": "^10.8.0",
+    "ts-node": "^10.8.1",
     "typescript": "^4.7.2"
   }
 }

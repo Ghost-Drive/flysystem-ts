@@ -9,9 +9,10 @@ import { inspect } from 'util';
 import { config } from 'dotenv';
 import { GoogleDriveAdapter } from '../src';
 
-// eslint-disable-next-line no-console
-const DEBUG = false;
-const log = (...args: any[]) => args.forEach((a) => (DEBUG ? console.info(inspect(a, { colors: true, depth: null })) : {}));
+config({ path: join(__dirname, '../../..', '.test.env') });
+
+const { DEBUG: LOG_MODE } = process.env;
+const log = (...args: any[]) => args.forEach((a) => (LOG_MODE === 'debug' ? console.info(inspect(a, { colors: true, depth: null })) : {}));
 
 type CredentialsType = Record<string, any> & { web: any };
 type OAuth2Client = Auth.OAuth2Client;
@@ -38,29 +39,25 @@ async function _getAccessToken(oAuth2Client: OAuth2Client): Promise<OAuth2Client
     console.warn('Paste code from this url to .test.env in GDRIVE_AUTH_CODE variable and run tests again');
 
     return new Promise<Auth.OAuth2Client>((resolve) => {
-        setTimeout(() => {
-            config({ path: join(__dirname, '../../..', '.test.env') });
+        const { GDRIVE_AUTH_CODE: code } = process.env;
 
-            const { GDRIVE_AUTH_CODE: code } = process.env;
+        if (!code) {
+            throw new Error('GDRIVE_AUTH_CODE variable in .test.env is empty');
+        }
 
-            if (!code) {
-                throw new Error('GDRIVE_AUTH_CODE variable in .test.env is empty');
+        oAuth2Client.getToken(code, (authError, token) => {
+            if (authError) {
+                console.error('Error retrieving access token', authError);
             }
 
-            oAuth2Client.getToken(code, (authError, token) => {
-                if (authError) {
-                    console.error('Error retrieving access token', authError);
-                }
+            oAuth2Client.setCredentials(token!);
+            // Store the token to disk for later program executions
+            fs.writeFile(join(__dirname, '..', TOKEN_PATH), JSON.stringify(token), (fsError) => {
+                console.info('Token stored to', TOKEN_PATH);
 
-                oAuth2Client.setCredentials(token!);
-                // Store the token to disk for later program executions
-                fs.writeFile(join(__dirname, '..', TOKEN_PATH), JSON.stringify(token), (fsError) => {
-                    console.info('Token stored to', TOKEN_PATH);
-
-                    resolve(oAuth2Client);
-                });
+                resolve(oAuth2Client);
             });
-        }, 2000);
+        });
     });
 }
 
