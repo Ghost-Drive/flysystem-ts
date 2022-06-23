@@ -28,7 +28,7 @@ function execInShell(command: string, pause = 0) {
             console.error(err);
             console.error('==== ERROR ====');
         }).on('exit', () => {
-            makePause(pause).then(resolve);
+            makePause(pause).then(resolve).catch(reject);
         });
     });
 }
