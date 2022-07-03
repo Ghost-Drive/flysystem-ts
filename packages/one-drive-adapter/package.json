@@ -27,13 +27,15 @@
   },
   "devDependencies": {
     "@flysystem-ts/flysystem": "^0.2.3",
-    "dotenv": "^16.0.1"
+    "dotenv": "^16.0.1",
+    "isomorphic-fetch": "^3.0.0"
   },
   "bugs": {
     "url": "https://github.com/Ghost-Drive/flysystem-ts/issues"
   },
   "dependencies": {
     "@flysystem-ts/adapter-interface": "^0.2.3",
-    "@flysystem-ts/common": "^0.2.2"
+    "@flysystem-ts/common": "^0.2.2",
+    "@microsoft/microsoft-graph-client": "^3.0.2"
   }
 }

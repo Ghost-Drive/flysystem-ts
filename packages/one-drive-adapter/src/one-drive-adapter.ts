@@ -7,10 +7,26 @@ import {
 } from '@flysystem-ts/common';
 import { ReadStream } from 'fs';
 import { Readable } from 'stream';
+import { Client, Options } from '@microsoft/microsoft-graph-client';
+import 'isomorphic-fetch';
 
 export class OneDriveAdapter implements IFlysystemAdapter {
-    getPathPrefix(): PathPrefixer {
+    private msClient!: Client;
+
+    private prefixer!: PathPrefixer;
+
+    constructor(private options: Options) {
+        this.msClient = Client.init(options);
+        this.prefixer = new PathPrefixer('');
+    }
+
+    listContents(path: string, deep: boolean): Promise<IStorageAttributes[]> {
+        // return this.msClient.api('/me/drive/root/children').get() as any;
         throw new Error('Method not implemented.');
+    }
+
+    getPathPrefix(): PathPrefixer {
+        return this.prefixer;
     }
 
     write(path: string, contents: string | Buffer, config?: VisibilityInterface | undefined): Promise<void> {
@@ -46,10 +62,6 @@ export class OneDriveAdapter implements IFlysystemAdapter {
     }
 
     fileSize(path: string): Promise<RequirePart<FileAttributes, 'fileSize'>> {
-        throw new Error('Method not implemented.');
-    }
-
-    listContents(path: string, deep: boolean): Promise<IStorageAttributes[]> {
         throw new Error('Method not implemented.');
     }
 
