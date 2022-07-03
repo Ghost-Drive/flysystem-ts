@@ -16,6 +16,7 @@ import { FOLDER_MIME_TYPE } from './google-drive.constants';
 function trimSlashes(str: string) {
     return `/${str.replace(/^\//, '').replace(/$\//, '')}`;
 }
+
 export class GoogleDriveAdapter implements IFlysystemAdapter {
     private virtualPathMapper!: VirtualPathMapper;
 

@@ -26,9 +26,14 @@
     "test": "echo \"Error: run tests from root\" && exit 1"
   },
   "devDependencies": {
+    "@flysystem-ts/flysystem": "^0.2.3",
     "dotenv": "^16.0.1"
   },
   "bugs": {
     "url": "https://github.com/Ghost-Drive/flysystem-ts/issues"
+  },
+  "dependencies": {
+    "@flysystem-ts/adapter-interface": "^0.2.3",
+    "@flysystem-ts/common": "^0.2.2"
   }
 }

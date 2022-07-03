@@ -16,6 +16,7 @@ const SORTED_CORE_PACKAGES = [
 const ADAPTER_PACKAGES = [
     '@flysystem-ts/drop-box-adapter',
     '@flysystem-ts/google-drive-adapter',
+    '@flysystem-ts/one-drive-adapter',
 ];
 const uninstallScript = `npx lerna exec npm uninstall ${SORTED_CORE_PACKAGES.join(' ')}`;
 const corePackageBootstrapingScript = SORTED_CORE_PACKAGES
@@ -53,12 +54,6 @@ async function bootstrap() {
         .split(' && ')
         .reduce((acc, c) => acc.then(() => execInShell(c)), Promise.resolve() as Promise<unknown>);
     await execInShell('npx lerna bootstrap');
-
-    console.log([
-        uninstallScript,
-        corePackageBootstrapingScript,
-        allAdaptersBootstrapingScript,
-    ]);
 }
 
 bootstrap();
