@@ -34,7 +34,7 @@
   },
   "gitHead": "a566b42a9f49466a85ffa1cd1600c71a20635382",
   "dependencies": {
-    "@flysystem-ts/adapter-interface": "^0.2.2",
-    "@flysystem-ts/common": "^0.2.1"
+    "@flysystem-ts/adapter-interface": "^0.2.3",
+    "@flysystem-ts/common": "^0.2.2"
   }
 }
