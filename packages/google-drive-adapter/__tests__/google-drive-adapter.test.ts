@@ -11,7 +11,7 @@ import { GoogleDriveAdapter } from '../src';
 
 config({ path: join(__dirname, '../../..', '.test.env') });
 
-const { DEBUG: LOG_MODE } = process.env;
+const { LOG_MODE } = process.env;
 const log = (...args: any[]) => args.forEach((a) => (LOG_MODE === 'debug' ? console.info(inspect(a, { colors: true, depth: null })) : {}));
 
 type CredentialsType = Record<string, any> & { web: any };
@@ -104,7 +104,7 @@ describe('GoogleDriveAdapter testing', () => {
         );
     }, 3000); // little more than input to give chance correct error appear in console in case of fail
 
-    it('Should return full list of files', async () => {
+    it.only('Should return full list of files', async () => {
         const res = await flysystem.listContents();
 
         log(res);

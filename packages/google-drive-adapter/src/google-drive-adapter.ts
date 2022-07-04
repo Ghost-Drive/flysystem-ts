@@ -72,6 +72,7 @@ export class GoogleDriveAdapter implements IFlysystemAdapter {
 
             if (isDir) {
                 return {
+                    id: file.id!,
                     isDir,
                     isFile,
                     path: idPath.get(file.id!),
@@ -84,6 +85,7 @@ export class GoogleDriveAdapter implements IFlysystemAdapter {
             }
 
             return {
+                id: file.id!,
                 fileSize: parseFloat(file.size!),
                 isDir,
                 isFile,

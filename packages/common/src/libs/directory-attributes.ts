@@ -8,5 +8,5 @@ export class DirectoryAttributes implements IStorageAttributes {
 
     type = FileTypeEnum.file;
 
-    constructor(public path: string, public visibility?: VisibilityEnum, public lastModified?: number) {}
+    constructor(public path: string, public id = '', public visibility?: VisibilityEnum, public lastModified?: number) {}
 }

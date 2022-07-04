@@ -10,7 +10,7 @@ config({ path: '../../../.test.env' });
 
 config({ path: join(__dirname, '../../..', '.test.env') });
 
-const { DEBUG: LOG_MODE } = process.env;
+const { LOG_MODE } = process.env;
 const log = (...args: any[]) => args.forEach((a) => (LOG_MODE === 'debug' ? console.info(inspect(a, { colors: true, depth: null })) : {}));
 
 const TEST_PIC_NAME = 'photo-for-test.jpg';
@@ -27,7 +27,7 @@ describe('Drop-box-adapter package testing', () => {
         expect(process.env.DBX_ACCESS).toBeDefined();
     });
 
-    it('Should return list of files', async () => {
+    it.only('Should return list of files', async () => {
         const res = await flysystem.listContents();
 
         expect(res).toBeInstanceOf(Array);

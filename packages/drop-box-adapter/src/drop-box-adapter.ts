@@ -23,6 +23,7 @@ import { Readable } from 'stream';
 import {
     DropboxOptions, Dropbox, files, DropboxResponse,
 } from 'dropbox';
+import { inspect } from 'util';
 
 export class DropboxAdapter implements IFlysystemAdapter {
     private dbx!: Dropbox;
@@ -89,7 +90,8 @@ export class DropboxAdapter implements IFlysystemAdapter {
             if (item['.tag'] === 'deleted') return acc;
 
             const data = {
-                path: item.name, // TODO name and path are not the same
+                path: item.path_display || item.path_lower || item.name,
+                id: item.id,
             };
 
             if (item['.tag'] === 'file') {
@@ -107,7 +109,7 @@ export class DropboxAdapter implements IFlysystemAdapter {
                     isDir: true,
                     isFile: false,
                     type: FileTypeEnum.dir,
-                });
+                } as any);
             }
 
             return acc;

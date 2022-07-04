@@ -8,6 +8,8 @@ export class FileAttributes implements IStorageAttributes {
 
     type = FileTypeEnum.file;
 
+    public id!: string;
+
     public fileSize?: number;
 
     public visibility?: VisibilityEnum;
@@ -21,6 +23,7 @@ export class FileAttributes implements IStorageAttributes {
     constructor(
     public path: string,
     options: {
+      id?: string,
       fileSize?: number,
       visibility?: VisibilityEnum,
       lastModified?: number,
@@ -28,6 +31,7 @@ export class FileAttributes implements IStorageAttributes {
       extraMetadata?: Record<string, any>
     } = {},
     ) {
+        this.id = options.id || '';
         this.extraMetada = options.extraMetadata || {};
         this.fileSize = options.fileSize;
         this.lastModified = options.lastModified;

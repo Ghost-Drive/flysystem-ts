@@ -1,6 +1,7 @@
 import { FileTypeEnum, VisibilityEnum } from '../enum';
 
 export interface IStorageAttributes {
+  id: string;
   path: string;
   type: FileTypeEnum;
   visibility?: VisibilityEnum;

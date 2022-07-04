@@ -6,7 +6,7 @@ import { OneDriveAdapter } from '../src';
 
 config({ path: join(__dirname, '../../..', '.test.env') });
 
-const { DEBUG: LOG_MODE } = process.env;
+const { LOG_MODE } = process.env;
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars, no-unused-vars
 const log = (...args: any[]) => args.forEach((a) => (LOG_MODE === 'debug' ? console.info(inspect(a, { colors: true, depth: null })) : {}));
