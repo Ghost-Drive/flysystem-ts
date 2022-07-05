@@ -27,8 +27,10 @@
   },
   "devDependencies": {
     "@flysystem-ts/flysystem": "^0.2.4",
+    "axios": "^0.27.2",
     "dotenv": "^16.0.1",
-    "isomorphic-fetch": "^3.0.0"
+    "isomorphic-fetch": "^3.0.0",
+    "query-string": "^7.1.1"
   },
   "bugs": {
     "url": "https://github.com/Ghost-Drive/flysystem-ts/issues"

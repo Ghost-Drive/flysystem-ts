@@ -21,8 +21,7 @@ export class OneDriveAdapter implements IFlysystemAdapter {
     }
 
     listContents(path: string, deep: boolean): Promise<IStorageAttributes[]> {
-        // return this.msClient.api('/me/drive/root/children').get() as any;
-        throw new Error('Method not implemented.');
+        return this.msClient.api('/me/drive/root/children').get() as any;
     }
 
     getPathPrefix(): PathPrefixer {

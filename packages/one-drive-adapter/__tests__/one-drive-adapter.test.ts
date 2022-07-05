@@ -1,3 +1,5 @@
+/* eslint-disable no-unused-vars */
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import { config } from 'dotenv';
 import { join } from 'path';
 import { inspect } from 'util';
@@ -8,7 +10,6 @@ config({ path: join(__dirname, '../../..', '.test.env') });
 
 const { LOG_MODE } = process.env;
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars, no-unused-vars
 const log = (...args: any[]) => args.forEach((a) => (LOG_MODE === 'debug' ? console.info(inspect(a, { colors: true, depth: null })) : {}));
 
 describe('OneDriveAdapter package testing', () => {
@@ -25,5 +26,13 @@ describe('OneDriveAdapter package testing', () => {
     it('Should authenticate to OneDrive', async () => {
         expect(process.env.ODRIVE_ACCESS).toBeDefined();
         expect(flysystem).toBeDefined();
+    });
+
+    it('Should return list of files', async () => {
+        const res = await flysystem.listContents();
+
+        log(res);
+
+        expect(res).toBeDefined();
     });
 });
