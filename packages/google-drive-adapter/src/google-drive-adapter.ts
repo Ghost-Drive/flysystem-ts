@@ -2,7 +2,7 @@
 /* eslint-disable no-unused-vars */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import {
-    FileAttributes, FileTypeEnum, VisibilityInterface, ReadFileOptionsInterface, IStorageAttributes, PathPrefixer, RequirePart, VisibilityEnum, DirectoryAttributes,
+    FileAttributes, FileTypeEnum, VisibilityInterface, ReadFileOptionsInterface, IStorageAttributes, PathPrefixer, RequirePart, VisibilityEnum, DirectoryAttributes, UnableToDeleteFileException,
 } from '@flysystem-ts/common';
 import { IFlysystemAdapter } from '@flysystem-ts/adapter-interface';
 import fs, { ReadStream } from 'fs';
@@ -111,6 +111,7 @@ export class GoogleDriveAdapter implements IFlysystemAdapter {
                     inWhichFolderOnly: ` and "${folderId}" in parents `,
                     fields: ['nextPageToken'],
                     fieldsInFile: ['name'],
+                    pageToken: nextPageToken,
                 });
 
             exists = res.files.some((f) => f.name! === fileName);
@@ -166,6 +167,7 @@ export class GoogleDriveAdapter implements IFlysystemAdapter {
                     inWhichFolderOnly: ` and "${folderId}" in parents `,
                     fields: ['nextPageToken'],
                     fieldsInFile: ['name', 'id'],
+                    pageToken: nextPageToken,
                 });
 
             needle = res.files.find((f) => f.name! === fileName);
@@ -189,8 +191,37 @@ export class GoogleDriveAdapter implements IFlysystemAdapter {
         throw new Error('Method not implemented.');
     }
 
-    delete(path: string): Promise<void> {
-        throw new Error('Method not implemented.');
+    async delete(path: string): Promise<void> {
+        const {
+            trimedPath, folderId, fileName, folderPath,
+        } = await this.explorePath(path);
+        let nextPageToken: string | null | undefined;
+        let needle: drive_v3.Schema$File | undefined;
+
+        do {
+            // eslint-disable-next-line no-await-in-loop
+            const res = await GoogleDriveApiExecutor
+                .req(this.gDrive)
+                .filesList({
+                    inWhichFolderOnly: ` and "${folderId}" in parents `,
+                    fields: ['nextPageToken'],
+                    fieldsInFile: ['name', 'id'],
+                    pageToken: nextPageToken,
+                });
+
+            needle = res.files.find((f) => f.name! === fileName);
+            nextPageToken = res.nextPageToken;
+
+            if (needle) {
+                break;
+            }
+        } while (nextPageToken);
+
+        if (!needle) {
+            throw new UnableToDeleteFileException(`Any files by this path ("${path}" interpreted as "${trimedPath})`);
+        }
+
+        await GoogleDriveApiExecutor.req(this.gDrive).filesDelete(needle.id!);
     }
 
     async deleteDirectory(path: string): Promise<void> {

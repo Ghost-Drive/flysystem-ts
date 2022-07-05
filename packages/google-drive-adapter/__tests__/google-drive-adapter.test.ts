@@ -104,7 +104,7 @@ describe('GoogleDriveAdapter testing', () => {
         );
     }, 3000); // little more than input to give chance correct error appear in console in case of fail
 
-    it.only('Should return full list of files', async () => {
+    it('Should return full list of files', async () => {
         const res = await flysystem.listContents();
 
         log(res);
