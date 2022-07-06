@@ -8,42 +8,43 @@ import {
     PathPrefixer,
     ReadFileOptionsInterface,
     VisibilityInterface,
+    PathOrId,
 } from '@flysystem-ts/common';
 
 export interface IFlysystemAdapter {
   getPathPrefix(): PathPrefixer;
 
-  fileExists(path: string): Promise<boolean>;
+  fileExists(pathOrId: PathOrId): Promise<boolean>;
 
-  directoryExists(path: string): Promise<boolean>;
+  directoryExists(pathOrId: PathOrId): Promise<boolean>;
 
-  write(path: string, contents: string | Buffer, config?: VisibilityInterface): Promise<void>;
+  write(pathOrParentIdName: PathOrId, contents: string | Buffer, config?: VisibilityInterface): Promise<void>;
 
-  writeStream(path: string, resource: Readable, config?: VisibilityInterface): Promise<void>;
+  writeStream(pathOrParentIdName: PathOrId, resource: Readable, config?: VisibilityInterface): Promise<void>;
 
-  read(path: string, config?: ReadFileOptionsInterface): Promise<string | Buffer>;
+  read(pathOrId: PathOrId, config?: ReadFileOptionsInterface): Promise<string | Buffer>;
 
-  readStream(path: string, config?: Record<string, any>): Promise<ReadStream>;
+  readStream(pathOrId: PathOrId, config?: Record<string, any>): Promise<ReadStream>;
 
-  delete(path: string): Promise<void>;
+  delete(pathOrId: PathOrId): Promise<void>;
 
-  deleteDirectory(path: string): Promise<void>;
+  deleteDirectory(pathOrId: PathOrId): Promise<void>;
 
-  createDirectory(path: string, config?: VisibilityInterface): Promise<void>;
+  createDirectory(pathOrParentIdName: PathOrId, config?: VisibilityInterface): Promise<void>;
 
-  setVisibility(path: string, visibility: VisibilityEnum): Promise<void>;
+  setVisibility(pathOrId: PathOrId, visibility: VisibilityEnum): Promise<void>;
 
-  visibility(path: string): Promise<RequirePart<FileAttributes, 'visibility'>>;
+  visibility(pathOrId: PathOrId): Promise<RequirePart<FileAttributes, 'visibility'>>;
 
-  mimeType(path: string): Promise<RequirePart<FileAttributes, 'mimeType'>>;
+  mimeType(pathOrId: PathOrId): Promise<RequirePart<FileAttributes, 'mimeType'>>;
 
-  lastModified(path: string): Promise<RequirePart<FileAttributes, 'lastModified'>>;
+  lastModified(pathOrId: PathOrId): Promise<RequirePart<FileAttributes, 'lastModified'>>;
 
-  fileSize(path: string): Promise<RequirePart<FileAttributes, 'fileSize'>>;
+  fileSize(pathOrId: PathOrId): Promise<RequirePart<FileAttributes, 'fileSize'>>;
 
-  listContents(path: string, deep: boolean): Promise<IStorageAttributes[]>;
+  listContents(pathOrId: PathOrId, deep: boolean): Promise<IStorageAttributes[]>;
 
-  move(source: string, destination: string, config?: Record<string, any>): Promise<void>;
+  move(source: PathOrId, destination: PathOrId, config?: Record<string, any>): Promise<void>;
 
-  copy(source: string, destination: string, config?: Record<string, any>): Promise<void>;
+  copy(source: PathOrId, destination: PathOrId, config?: Record<string, any>): Promise<void>;
 }

@@ -1,6 +1,6 @@
 import {
     VisibilityEnum, IFilesystemOperator, IFilesystemConfig,
-    isReadableStream, WhitespacePathNormalizer, InvalidStreamProvidedException,
+    isReadableStream, WhitespacePathNormalizer, InvalidStreamProvidedException, PathOrId,
 } from '@flysystem-ts/common';
 import get from 'lodash/get';
 import { Readable } from 'stream';
@@ -30,92 +30,173 @@ export class Flysystem<T extends IFlysystemAdapter> implements IFilesystemOperat
         return get(this.config, key, defaultValue);
     }
 
-    public fileExists(location: string): Promise<boolean> {
-        return this.adapter.fileExists(this.pathNormalizer.normalizePath(location));
+    public fileExists(pathOrId: PathOrId): Promise<boolean> {
+        return this.adapter.fileExists(pathOrId);
     }
 
-    public directoryExists(location: string): Promise<boolean> {
-        return this.adapter.directoryExists(this.pathNormalizer.normalizePath(location));
+    public directoryExists(pathOrId: PathOrId): Promise<boolean> {
+        return this.adapter.directoryExists(pathOrId);
     }
 
-    public async write(path: string, contents: string | Buffer, config?: any) {
-        return this.getAdapter().write(this.pathNormalizer.normalizePath(path), contents, config);
+    public async write(pathOrId: PathOrId, contents: string | Buffer, config?: any) {
+        if (pathOrId.type === 'path') {
+            // eslint-disable-next-line no-param-reassign
+            pathOrId.value = this.pathNormalizer.normalizePath(pathOrId.value);
+        }
+
+        return this.getAdapter().write(pathOrId, contents, config);
     }
 
-    public async writeStream(path: string, resource: Readable, config?: Record<string, any>) {
+    public async writeStream(pathOrId: PathOrId, resource: Readable, config?: Record<string, any>) {
         if (!isReadableStream(resource)) {
             throw new InvalidStreamProvidedException('writeStream expects argument #2 to be a valid readStream.');
         }
 
-        // eslint-disable-next-line no-param-reassign
-        path = this.pathNormalizer.normalizePath(path);
+        if (pathOrId.type === 'path') {
+            // eslint-disable-next-line no-param-reassign
+            pathOrId.value = this.pathNormalizer.normalizePath(pathOrId.value);
+        }
+
         // eslint-disable-next-line no-param-reassign
         config = this.prepareConfig(config);
 
-        // TODO: rewindStream
-
-        return this.getAdapter().writeStream(path, resource, config);
+        return this.getAdapter().writeStream(pathOrId, resource, config);
     }
 
-    public read(path: string, config?: any) {
-        return this.getAdapter().read(this.pathNormalizer.normalizePath(path), config);
+    public read(pathOrId: PathOrId, config?: any) {
+        if (pathOrId.type === 'path') {
+            // eslint-disable-next-line no-param-reassign
+            pathOrId.value = this.pathNormalizer.normalizePath(pathOrId.value);
+        }
+
+        return this.getAdapter().read(pathOrId, config);
     }
 
-    public readStream(path: string, config?: any) {
-        return this.getAdapter().readStream(this.pathNormalizer.normalizePath(path), config);
+    public readStream(pathOrId: PathOrId, config?: any) {
+        if (pathOrId.type === 'path') {
+            // eslint-disable-next-line no-param-reassign
+            pathOrId.value = this.pathNormalizer.normalizePath(pathOrId.value);
+        }
+
+        return this.getAdapter().readStream(pathOrId, config);
     }
 
-    public copy(path: string, newPath: string, config?: any) {
+    public copy(source: PathOrId, destination: PathOrId, config?: any) {
+        if (source.type === 'path') {
+            // eslint-disable-next-line no-param-reassign
+            source.value = this.pathNormalizer.normalizePath(source.value);
+        }
+
+        if (destination.type === 'path') {
+            // eslint-disable-next-line no-param-reassign
+            destination.value = this.pathNormalizer.normalizePath(destination.value);
+        }
+
         return this.getAdapter().copy(
-            this.pathNormalizer.normalizePath(path),
-            this.pathNormalizer.normalizePath(newPath),
+            source,
+            destination,
             config,
         );
     }
 
-    public async delete(path: string) {
-        return this.getAdapter().delete(this.pathNormalizer.normalizePath(path));
+    public async delete(pathOrId: PathOrId) {
+        if (pathOrId.type === 'path') {
+            // eslint-disable-next-line no-param-reassign
+            pathOrId.value = this.pathNormalizer.normalizePath(pathOrId.value);
+        }
+
+        return this.getAdapter().delete(pathOrId);
     }
 
-    public deleteDirectory(dirname: string) {
-        return this.getAdapter().deleteDirectory(this.pathNormalizer.normalizePath(dirname));
+    public deleteDirectory(pathOrId: PathOrId) {
+        if (pathOrId.type === 'path') {
+            // eslint-disable-next-line no-param-reassign
+            pathOrId.value = this.pathNormalizer.normalizePath(pathOrId.value);
+        }
+
+        return this.getAdapter().deleteDirectory(pathOrId);
     }
 
-    public createDirectory(dirname: string, config?: any) {
+    public createDirectory(pathOrId: PathOrId, config?: any) {
+        if (pathOrId.type === 'path') {
+            // eslint-disable-next-line no-param-reassign
+            pathOrId.value = this.pathNormalizer.normalizePath(pathOrId.value);
+        }
+
         // eslint-disable-next-line no-param-reassign
         config = this.prepareConfig(config);
 
-        return this.getAdapter().createDirectory(this.pathNormalizer.normalizePath(dirname), this.prepareConfig(config));
+        return this.getAdapter().createDirectory(pathOrId, this.prepareConfig(config));
     }
 
-    public async listContents(directory = '', recursive = Flysystem.LIST_DEEP) {
-        return this.getAdapter().listContents(this.pathNormalizer.normalizePath(directory), recursive);
+    public async listContents(pathOrId: PathOrId = { type: 'path', value: '' }, recursive = Flysystem.LIST_DEEP) {
+        if (pathOrId.type === 'path') {
+            // eslint-disable-next-line no-param-reassign
+            pathOrId.value = this.pathNormalizer.normalizePath(pathOrId.value);
+        }
+
+        return this.getAdapter().listContents(pathOrId, recursive);
     }
 
-    public async mimeType(path: string) {
-        return (await this.getAdapter().mimeType(this.pathNormalizer.normalizePath(path))).mimeType;
+    public async mimeType(pathOrId: PathOrId) {
+        if (pathOrId.type === 'path') {
+            // eslint-disable-next-line no-param-reassign
+            pathOrId.value = this.pathNormalizer.normalizePath(pathOrId.value);
+        }
+
+        return (await this.getAdapter().mimeType(pathOrId)).mimeType;
     }
 
-    public async lastModified(path: string) {
-        return (await this.getAdapter().lastModified(this.pathNormalizer.normalizePath(path))).lastModified;
+    public async lastModified(pathOrId: PathOrId) {
+        if (pathOrId.type === 'path') {
+            // eslint-disable-next-line no-param-reassign
+            pathOrId.value = this.pathNormalizer.normalizePath(pathOrId.value);
+        }
+
+        return (await this.getAdapter().lastModified(pathOrId)).lastModified;
     }
 
-    public async visibility(path: string) {
-        return (await this.getAdapter().visibility(this.pathNormalizer.normalizePath(path))).visibility;
+    public async visibility(pathOrId: PathOrId) {
+        if (pathOrId.type === 'path') {
+            // eslint-disable-next-line no-param-reassign
+            pathOrId.value = this.pathNormalizer.normalizePath(pathOrId.value);
+        }
+
+        return (await this.getAdapter().visibility(pathOrId)).visibility;
     }
 
-    public async fileSize(path: string) {
-        return (await this.getAdapter().fileSize(this.pathNormalizer.normalizePath(path))).fileSize;
+    public async fileSize(pathOrId: PathOrId) {
+        if (pathOrId.type === 'path') {
+            // eslint-disable-next-line no-param-reassign
+            pathOrId.value = this.pathNormalizer.normalizePath(pathOrId.value);
+        }
+
+        return (await this.getAdapter().fileSize(pathOrId)).fileSize;
     }
 
-    public setVisibility(path: string, visibility: VisibilityEnum | string) {
-        return this.getAdapter().setVisibility(this.pathNormalizer.normalizePath(path), visibility as VisibilityEnum);
+    public setVisibility(pathOrId: PathOrId, visibility: VisibilityEnum | string) {
+        if (pathOrId.type === 'path') {
+            // eslint-disable-next-line no-param-reassign
+            pathOrId.value = this.pathNormalizer.normalizePath(pathOrId.value);
+        }
+
+        return this.getAdapter().setVisibility(pathOrId, visibility as VisibilityEnum);
     }
 
-    public move(source: string, destination: string, config?: Record<string, any>): Promise<void> {
+    public move(source: PathOrId, destination: PathOrId, config?: Record<string, any>): Promise<void> {
+        if (source.type === 'path') {
+            // eslint-disable-next-line no-param-reassign
+            source.value = this.pathNormalizer.normalizePath(source.value);
+        }
+
+        if (destination.type === 'path') {
+            // eslint-disable-next-line no-param-reassign
+            destination.value = this.pathNormalizer.normalizePath(destination.value);
+        }
+
         return this.getAdapter().move(
-            this.pathNormalizer.normalizePath(source),
-            this.pathNormalizer.normalizePath(destination),
+            source,
+            destination,
             this.prepareConfig(config),
         );
     }

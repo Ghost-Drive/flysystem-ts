@@ -107,23 +107,19 @@ describe('GoogleDriveAdapter testing', () => {
     it('Should return full list of files', async () => {
         const res = await flysystem.listContents();
 
-        log(res);
-
         expect(res).toBeInstanceOf(Array);
         expect(res.length).not.toBe(0);
     }, 1000 * 10);
 
     it('Should not contain any like "A" folders', async () => {
-        const res = await flysystem.listContents('C');
-
-        log(res);
+        const res = await flysystem.listContents({ type: 'path', value: 'C' });
 
         expect(res).toBeInstanceOf(Array);
         expect(res.some(({ path }) => /\/A+\//.test(path))).toBe(false);
     }, 1000 * 10);
 
     it('Should return empty array', async () => {
-        const res = await flysystem.listContents('EmptyFolder');
+        const res = await flysystem.listContents({ type: 'path', value: 'EmptyFolder' });
 
         log(res);
 
@@ -132,9 +128,7 @@ describe('GoogleDriveAdapter testing', () => {
     }, 1000 * 10);
 
     it('Should return folder entries without recurcion', async () => {
-        const res = await flysystem.listContents('C', false);
-
-        log(res);
+        const res = await flysystem.listContents({ value: 'C', type: 'path' }, false);
 
         expect(res).toBeInstanceOf(Array);
         expect(res.length).not.toBe(0);
@@ -142,7 +136,7 @@ describe('GoogleDriveAdapter testing', () => {
     }, 1000 * 10);
 
     it('Should return true because of file existing', async () => {
-        const res = await flysystem.fileExists('/A/random.pdf');
+        const res = await flysystem.fileExists({ value: '/A/random.pdf', type: 'path' });
 
         log(res);
 
@@ -150,7 +144,7 @@ describe('GoogleDriveAdapter testing', () => {
     }, 1000 * 10);
 
     it('Should return false because of file unexisting', async () => {
-        const res = await flysystem.fileExists('/A/no-such-file.pdf');
+        const res = await flysystem.fileExists({ value: '/A/no-such-file.pdf', type: 'path' });
 
         log(res);
 
@@ -158,10 +152,10 @@ describe('GoogleDriveAdapter testing', () => {
     }, 1000 * 10);
 
     it.each([
-        { path: 'C/CC/CCC', isExists: true },
-        { path: 'N/O/S/U/C/H/F/O/L/D/E/R', isExists: false },
-    ])('Should return is directory exist', async ({ path, isExists }) => {
-        const res = await flysystem.directoryExists(path);
+        { pathOrId: { value: 'C/CC/CCC', type: 'path' as const }, isExists: true },
+        { pathOrId: { value: 'N/O/S/U/C/H/F/O/L/D/E/R', type: 'path' as const }, isExists: false },
+    ])('Should return is directory exist', async ({ pathOrId, isExists }) => {
+        const res = await flysystem.directoryExists(pathOrId);
 
         log(res);
 
@@ -171,45 +165,49 @@ describe('GoogleDriveAdapter testing', () => {
     it('Should upload picture (stream)', async () => {
         const picName = `pic-${new Date().getTime()}-test.jpg`;
         const path = `B/${picName}`;
+        const pathOrId = { value: path, type: 'path' as const };
 
-        await flysystem.writeStream(path, fs.createReadStream(TEST_PIC_PATH));
+        await flysystem.writeStream(pathOrId, fs.createReadStream(TEST_PIC_PATH));
 
-        expect(await flysystem.fileExists(path)).toBe(true);
+        expect(await flysystem.fileExists(pathOrId)).toBe(true);
     });
 
     it('Should upload picture (buffer)', async () => {
         const picName = `pic-${new Date().getTime()}-test.jpg`;
         const path = `B/${picName}`;
+        const pathOrId = { value: path, type: 'path' as const };
 
-        await flysystem.write(path, fs.readFileSync(TEST_PIC_PATH));
+        await flysystem.write(pathOrId, fs.readFileSync(TEST_PIC_PATH));
 
-        expect(await flysystem.fileExists(path)).toBe(true);
+        expect(await flysystem.fileExists(pathOrId)).toBe(true);
     });
 
     it('Should create directory', async () => {
         const folderName = `new-folder-${new Date().getTime()}-test`;
         const path = `A/${folderName}`;
+        const pathOrId = { type: 'path' as const, value: path };
 
-        await flysystem.createDirectory(path);
+        await flysystem.createDirectory(pathOrId);
 
-        expect(await flysystem.directoryExists(path)).toBe(true);
+        expect(await flysystem.directoryExists(pathOrId)).toBe(true);
     });
 
     it('Should remove directory', async () => {
         const folderName = `new-folder-${new Date().getTime()}-test`;
         const path = `A/${folderName}`;
+        const pathOrId = { type: 'path' as const, value: path };
 
-        await flysystem.createDirectory(path);
+        await flysystem.createDirectory(pathOrId);
 
-        expect(await flysystem.directoryExists(path)).toBe(true);
+        expect(await flysystem.directoryExists(pathOrId)).toBe(true);
 
-        await flysystem.deleteDirectory(path);
+        await flysystem.deleteDirectory(pathOrId);
 
-        expect(await flysystem.directoryExists(path)).toBe(false);
+        expect(await flysystem.directoryExists(pathOrId)).toBe(false);
     }, 10_000);
 
     it('Should download file', async () => {
-        const res = await flysystem.read('/A/random.pdf');
+        const res = await flysystem.read({ value: '/A/random.pdf', type: 'path' });
         const pathToDownload = join(__dirname, 'downloaded.pdf');
 
         fs.writeFileSync(pathToDownload, res);

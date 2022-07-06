@@ -2,7 +2,7 @@
 /* eslint-disable no-unused-vars */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import {
-    FileAttributes, FileTypeEnum, VisibilityInterface, ReadFileOptionsInterface, IStorageAttributes, PathPrefixer, RequirePart, VisibilityEnum, DirectoryAttributes, UnableToDeleteFileException,
+    FileAttributes, FileTypeEnum, VisibilityInterface, ReadFileOptionsInterface, IStorageAttributes, PathPrefixer, RequirePart, VisibilityEnum, DirectoryAttributes, UnableToDeleteFileException, FlysystemException, PathOrId,
 } from '@flysystem-ts/common';
 import { IFlysystemAdapter } from '@flysystem-ts/adapter-interface';
 import fs, { ReadStream } from 'fs';
@@ -14,7 +14,7 @@ import { FileListOptionsType, GoogleDriveApiExecutor } from './google-drive-api-
 import { FOLDER_MIME_TYPE } from './google-drive.constants';
 
 function trimSlashes(str: string) {
-    return `/${str.replace(/^\//, '').replace(/$\//, '')}`;
+    return `/${str.replace(/^\//, '').replace(/\/$/, '')}`;
 }
 
 export class GoogleDriveAdapter implements IFlysystemAdapter {
@@ -29,7 +29,13 @@ export class GoogleDriveAdapter implements IFlysystemAdapter {
         this.prefixer = new PathPrefixer('');
     }
 
-    async listContents(path: string, deep: boolean): Promise<IStorageAttributes[]> {
+    async listContents(pathOrId: PathOrId, deep: boolean): Promise<IStorageAttributes[]> {
+        if (pathOrId.type !== 'path') {
+            throw new FlysystemException('ById API is not implemented yet');
+        }
+
+        const { value: path } = pathOrId;
+
         const {
             folderId, folders, trimedPath, pathId, idPath,
         } = await this.explorePath(path, true);
@@ -98,7 +104,12 @@ export class GoogleDriveAdapter implements IFlysystemAdapter {
     }
 
     // TODO What we should do, if the file name will contains "/" character???
-    async fileExists(path: string): Promise<boolean> {
+    async fileExists(pathOrId: PathOrId): Promise<boolean> {
+        if (pathOrId.type !== 'path') {
+            throw new FlysystemException('ById API is not implemented yet');
+        }
+
+        const { value: path } = pathOrId;
         const { folderId, fileName, folderPath } = await this.explorePath(path);
         let nextPageToken: string | null | undefined;
         let exists = false;
@@ -129,14 +140,24 @@ export class GoogleDriveAdapter implements IFlysystemAdapter {
         return this.prefixer;
     }
 
-    async directoryExists(path: string): Promise<boolean> {
+    async directoryExists(pathOrId: PathOrId): Promise<boolean> {
+        if (pathOrId.type !== 'path') {
+            throw new FlysystemException('ById API is not implemented yet');
+        }
+
+        const { value: path } = pathOrId;
         const { folders, idPath, pathId } = await this.virtualPathMapper.virtualize();
         const _path = trimSlashes(path);
 
         return !!pathId.get(_path);
     }
 
-    async write(path: string, contents: string | Buffer, config?: VisibilityInterface | undefined): Promise<void> {
+    async write(pathOrId: PathOrId, contents: string | Buffer, config?: VisibilityInterface | undefined): Promise<void> {
+        if (pathOrId.type !== 'path') {
+            throw new FlysystemException('ById API is not implemented yet');
+        }
+
+        const { value: path } = pathOrId;
         const { folderId, folderPath, fileName } = await this.explorePath(path);
 
         await GoogleDriveApiExecutor
@@ -144,7 +165,12 @@ export class GoogleDriveAdapter implements IFlysystemAdapter {
             .filesCreateFromStream(folderId, fileName!, Readable.from(contents));
     }
 
-    async writeStream(path: string, resource: Readable, config?: VisibilityInterface | undefined): Promise<void> {
+    async writeStream(pathOrId: PathOrId, resource: Readable, config?: VisibilityInterface | undefined): Promise<void> {
+        if (pathOrId.type !== 'path') {
+            throw new FlysystemException('ById API is not implemented yet');
+        }
+
+        const { value: path } = pathOrId;
         const { folderId, folderPath, fileName } = await this.explorePath(path);
 
         await GoogleDriveApiExecutor
@@ -152,7 +178,12 @@ export class GoogleDriveAdapter implements IFlysystemAdapter {
             .filesCreateFromStream(folderId, fileName!, resource);
     }
 
-    async read(path: string, config?: ReadFileOptionsInterface | undefined): Promise<string | Buffer> {
+    async read(pathOrId: PathOrId, config?: ReadFileOptionsInterface | undefined): Promise<string | Buffer> {
+        if (pathOrId.type !== 'path') {
+            throw new FlysystemException('ById API is not implemented yet');
+        }
+
+        const { value: path } = pathOrId;
         const {
             trimedPath, folderId, fileName, folderPath,
         } = await this.explorePath(path);
@@ -187,11 +218,16 @@ export class GoogleDriveAdapter implements IFlysystemAdapter {
             .filesGet(needle.id!) as Promise<Buffer>;
     }
 
-    readStream(path: string, config?: Record<string, any> | undefined): Promise<ReadStream> {
+    readStream(pathOrId: PathOrId, config?: Record<string, any> | undefined): Promise<ReadStream> {
         throw new Error('Method not implemented.');
     }
 
-    async delete(path: string): Promise<void> {
+    async delete(pathOrId: PathOrId): Promise<void> {
+        if (pathOrId.type !== 'path') {
+            throw new FlysystemException('ById API is not implemented yet');
+        }
+
+        const { value: path } = pathOrId;
         const {
             trimedPath, folderId, fileName, folderPath,
         } = await this.explorePath(path);
@@ -224,13 +260,23 @@ export class GoogleDriveAdapter implements IFlysystemAdapter {
         await GoogleDriveApiExecutor.req(this.gDrive).filesDelete(needle.id!);
     }
 
-    async deleteDirectory(path: string): Promise<void> {
+    async deleteDirectory(pathOrId: PathOrId): Promise<void> {
+        if (pathOrId.type !== 'path') {
+            throw new FlysystemException('ById API is not implemented yet');
+        }
+
+        const { value: path } = pathOrId;
         const { folderId } = await this.explorePath(path, true);
 
         await GoogleDriveApiExecutor.req(this.gDrive).filesDelete(folderId);
     }
 
-    async createDirectory(path: string, config?: VisibilityInterface | undefined): Promise<void> {
+    async createDirectory(pathOrId: PathOrId, config?: VisibilityInterface | undefined): Promise<void> {
+        if (pathOrId.type !== 'path') {
+            throw new FlysystemException('ById API is not implemented yet');
+        }
+
+        const { value: path } = pathOrId;
         const _path = trimSlashes(path);
         const upFolder = _path.slice(0, _path.lastIndexOf('/'));
         const folder = _path.slice(upFolder.length + 1);
@@ -240,31 +286,31 @@ export class GoogleDriveAdapter implements IFlysystemAdapter {
         await GoogleDriveApiExecutor.req(this.gDrive).filesCreateFolder(parentId!, folder);
     }
 
-    setVisibility(path: string, visibility: VisibilityEnum): Promise<void> {
+    setVisibility(pathOrId: PathOrId, visibility: VisibilityEnum): Promise<void> {
         throw new Error('Method not implemented.');
     }
 
-    visibility(path: string): Promise<RequirePart<FileAttributes, 'visibility'>> {
+    visibility(pathOrId: PathOrId): Promise<RequirePart<FileAttributes, 'visibility'>> {
         throw new Error('Method not implemented.');
     }
 
-    mimeType(path: string): Promise<RequirePart<FileAttributes, 'mimeType'>> {
+    mimeType(pathOrId: PathOrId): Promise<RequirePart<FileAttributes, 'mimeType'>> {
         throw new Error('Method not implemented.');
     }
 
-    lastModified(path: string): Promise<RequirePart<FileAttributes, 'lastModified'>> {
+    lastModified(pathOrId: PathOrId): Promise<RequirePart<FileAttributes, 'lastModified'>> {
         throw new Error('Method not implemented.');
     }
 
-    fileSize(path: string): Promise<RequirePart<FileAttributes, 'fileSize'>> {
+    fileSize(pathOrId: PathOrId): Promise<RequirePart<FileAttributes, 'fileSize'>> {
         throw new Error('Method not implemented.');
     }
 
-    move(source: string, destination: string, config?: Record<string, any> | undefined): Promise<void> {
+    move(source: PathOrId, destination: PathOrId, config?: Record<string, any> | undefined): Promise<void> {
         throw new Error('Method not implemented.');
     }
 
-    copy(source: string, destination: string, config?: Record<string, any> | undefined): Promise<void> {
+    copy(source: PathOrId, destination: PathOrId, config?: Record<string, any> | undefined): Promise<void> {
         throw new Error('Method not implemented.');
     }
 
@@ -276,7 +322,7 @@ export class GoogleDriveAdapter implements IFlysystemAdapter {
             : trimedPath.match(/(?!\/)[^\/]+$/) || [];
         const folderPath = isFolder
             ? trimedPath
-            : trimedPath.slice(0, path.lastIndexOf(fileName!));
+            : trimedPath.slice(0, trimedPath.lastIndexOf(`/${fileName!}`));
         const folderId = pathId.get(folderPath);
 
         if (!folderId) {

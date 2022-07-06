@@ -27,14 +27,14 @@ describe('Drop-box-adapter package testing', () => {
         expect(process.env.DBX_ACCESS).toBeDefined();
     });
 
-    it.only('Should return list of files', async () => {
+    it('Should return list of files', async () => {
         const res = await flysystem.listContents();
 
         expect(res).toBeInstanceOf(Array);
     });
 
     it('Should return only files from "animals" folder', async () => {
-        const res = await flysystem.listContents('/animals');
+        const res = await flysystem.listContents({ value: '/animals', type: 'path' });
 
         log(res);
 
@@ -42,20 +42,20 @@ describe('Drop-box-adapter package testing', () => {
     });
 
     it('Should return "false". Folder is not exists', async () => {
-        const res = await flysystem.directoryExists('no-such-directory');
+        const res = await flysystem.directoryExists({ value: 'no-such-directory', type: 'path' });
 
         expect(res).toBe(false);
     });
 
     it('Should create and remove directory', async () => {
-        await flysystem.createDirectory('hello');
+        await flysystem.createDirectory({ value: 'hello', type: 'path' });
 
-        const isFolderCreated = await flysystem.directoryExists('hello');
+        const isFolderCreated = await flysystem.directoryExists({ value: 'hello', type: 'path' });
 
         expect(isFolderCreated).toBe(true);
-        await flysystem.deleteDirectory('hello');
+        await flysystem.deleteDirectory({ value: 'hello', type: 'path' });
 
-        const isFolderRemoved = !(await flysystem.directoryExists('hello'));
+        const isFolderRemoved = !(await flysystem.directoryExists({ value: 'hello', type: 'path' }));
 
         expect(isFolderRemoved).toBe(true);
     });
@@ -63,10 +63,11 @@ describe('Drop-box-adapter package testing', () => {
     it('Should upload file', async () => {
         const pic = fs.readFileSync(TEST_PIC_PATH);
         const dbxPath = `one/pic-${new Date().getTime()}.jpg`;
+        const pathOrId = { value: dbxPath, type: 'path' as const };
 
-        await flysystem.write(dbxPath, pic);
+        await flysystem.write(pathOrId, pic);
 
-        const success = await flysystem.fileExists(dbxPath);
+        const success = await flysystem.fileExists(pathOrId);
 
         expect(success).toBe(true);
     });
@@ -74,10 +75,11 @@ describe('Drop-box-adapter package testing', () => {
     it('Should upload and remove file', async () => {
         const pic = fs.readFileSync(TEST_PIC_PATH);
         const dbxPath = `one/pic-${new Date().getTime()}.jpg`;
+        const pathOrId = { value: dbxPath, type: 'path' as const };
 
-        await flysystem.write(dbxPath, pic);
-        await flysystem.delete(dbxPath);
+        await flysystem.write(pathOrId, pic);
+        await flysystem.delete(pathOrId);
 
-        expect(await flysystem.fileExists(dbxPath)).toBe(false);
+        expect(await flysystem.fileExists(pathOrId)).toBe(false);
     });
 });

@@ -15,6 +15,7 @@ import {
     RequirePart,
     VisibilityInterface,
     ReadFileOptionsInterface,
+    PathOrId,
 } from '@flysystem-ts/common';
 import { IFlysystemAdapter } from '@flysystem-ts/adapter-interface';
 import moment from 'moment';
@@ -50,25 +51,30 @@ export class DropboxAdapter implements IFlysystemAdapter {
             : '';
     }
 
-    writeStream(path: string, resource: Readable, config?: VisibilityInterface | undefined): Promise<void> {
+    writeStream(pathOrId: PathOrId, resource: Readable, config?: VisibilityInterface | undefined): Promise<void> {
         throw new Error('This method is not implemented yet');
     }
 
-    visibility(path: string): Promise<RequirePart<FileAttributes, 'visibility'>> {
+    visibility(pathOrId: PathOrId): Promise<RequirePart<FileAttributes, 'visibility'>> {
         throw new NotSupportedException('Adapter does not support visibility controls.');
     }
 
-    setVisibility(path: string, visibility: VisibilityEnum): Promise<void> {
+    setVisibility(pathOrId: PathOrId, visibility: VisibilityEnum): Promise<void> {
         throw new NotSupportedException('Adapter does not support visibility controls.');
     }
 
-    async readStream(path: string, config?: Record<string, any> | undefined): Promise<ReadStream> {
+    async readStream(pathOrId: PathOrId, config?: Record<string, any> | undefined): Promise<ReadStream> {
         throw new Error('This method is not implemented yet');
     }
 
-    async read(path: string, config?: ReadFileOptionsInterface | undefined): Promise<string | Buffer> {
+    async read(pathOrId: PathOrId, config?: ReadFileOptionsInterface | undefined): Promise<string | Buffer> {
+        if (pathOrId.type !== 'path') {
+            throw new FlysystemException('ById API is not implemented yet');
+        }
+
+        const { value: path } = pathOrId;
         const location = this.applyPathPrefix(path);
-        const { fileSize } = await this.fileSize(path);
+        const { fileSize } = await this.fileSize(pathOrId);
 
         // TODO (check)
         // file is to large - so we simply return link for downloading it
@@ -83,7 +89,12 @@ export class DropboxAdapter implements IFlysystemAdapter {
         return fileBinary;
     }
 
-    async listContents(path: string, deep: boolean): Promise<IStorageAttributes[]> {
+    async listContents(pathOrId: PathOrId, deep: boolean): Promise<IStorageAttributes[]> {
+        if (pathOrId.type !== 'path') {
+            throw new FlysystemException('ById API is not implemented yet');
+        }
+
+        const { value: path } = pathOrId;
         const { headers, status, result: { entries } } = await this.dbx.filesListFolder({ path: this.applyPathPrefix(path), recursive: deep });
 
         return entries.reduce((acc, item) => {
@@ -121,8 +132,14 @@ export class DropboxAdapter implements IFlysystemAdapter {
         return this.prefixer;
     }
 
-    async copy(source: string, destination: string, config?: Record<string, any> | undefined): Promise<void> {
-        const [fromPath, toPath] = [this.applyPathPrefix(source), this.applyPathPrefix(destination)];
+    async copy(source: PathOrId, destination: PathOrId, config?: Record<string, any> | undefined): Promise<void> {
+        if (source.type !== 'id' || destination.type !== 'id') {
+            throw new FlysystemException('ById API is not implemented yet');
+        }
+
+        const { value: _source } = source;
+        const { value: _destination } = destination;
+        const [fromPath, toPath] = [this.applyPathPrefix(_source), this.applyPathPrefix(_destination)];
 
         try {
             await this.dbx.filesCopyV2({
@@ -134,13 +151,23 @@ export class DropboxAdapter implements IFlysystemAdapter {
         }
     }
 
-    async createDirectory(path: string, config?: VisibilityInterface | undefined): Promise<void> {
+    async createDirectory(pathOrId: PathOrId, config?: VisibilityInterface | undefined): Promise<void> {
+        if (pathOrId.type !== 'path') {
+            throw new FlysystemException('ById API is not implemented yet');
+        }
+
+        const { value: path } = pathOrId;
         const location = this.applyPathPrefix(path);
 
         await this.dbx.filesCreateFolderV2({ path: location });
     }
 
-    async delete(path: string): Promise<void> {
+    async delete(pathOrId: PathOrId): Promise<void> {
+        if (pathOrId.type !== 'path') {
+            throw new FlysystemException('ById API is not implemented yet');
+        }
+
+        const { value: path } = pathOrId;
         const location = this.applyPathPrefix(path);
 
         try {
@@ -149,11 +176,16 @@ export class DropboxAdapter implements IFlysystemAdapter {
         } catch (error) { }
     }
 
-    deleteDirectory(path: string): Promise<void> {
-        return this.delete(path);
+    deleteDirectory(pathOrId: PathOrId): Promise<void> {
+        return this.delete(pathOrId);
     }
 
-    async fileExists(path: string): Promise<boolean> {
+    async fileExists(pathOrId: PathOrId): Promise<boolean> {
+        if (pathOrId.type !== 'path') {
+            throw new FlysystemException('ById API is not implemented yet');
+        }
+
+        const { value: path } = pathOrId;
         const location = this.applyPathPrefix(path);
 
         try {
@@ -165,11 +197,16 @@ export class DropboxAdapter implements IFlysystemAdapter {
         }
     }
 
-    async directoryExists(path: string): Promise<boolean> {
-        return this.fileExists(path);
+    async directoryExists(pathOrId: PathOrId): Promise<boolean> {
+        return this.fileExists(pathOrId);
     }
 
-    async fileSize(path: string): Promise<RequirePart<FileAttributes, 'fileSize'>> {
+    async fileSize(pathOrId: PathOrId): Promise<RequirePart<FileAttributes, 'fileSize'>> {
+        if (pathOrId.type !== 'path') {
+            throw new FlysystemException('ById API is not implemented yet');
+        }
+
+        const { value: path } = pathOrId;
         const location = this.applyPathPrefix(path);
         let meta: Partial<files.FileMetadataReference>;
 
@@ -187,7 +224,12 @@ export class DropboxAdapter implements IFlysystemAdapter {
         return new FileAttributes(location, { fileSize: meta.size }) as { fileSize: number };
     }
 
-    async lastModified(path: string): Promise<RequirePart<FileAttributes, 'lastModified'>> {
+    async lastModified(pathOrId: PathOrId): Promise<RequirePart<FileAttributes, 'lastModified'>> {
+        if (pathOrId.type !== 'path') {
+            throw new FlysystemException('ById API is not implemented yet');
+        }
+
+        const { value: path } = pathOrId;
         const location = this.applyPathPrefix(path);
         let meta: Partial<files.FileMetadataReference>;
 
@@ -205,7 +247,12 @@ export class DropboxAdapter implements IFlysystemAdapter {
         return new FileAttributes(location, { lastModified: moment(meta.server_modified).unix() }) as FileAttributes & { lastModified: number };
     }
 
-    async mimeType(path: string): Promise<RequirePart<FileAttributes, 'mimeType'>> {
+    async mimeType(pathOrId: PathOrId): Promise<RequirePart<FileAttributes, 'mimeType'>> {
+        if (pathOrId.type !== 'path') {
+            throw new FlysystemException('ById API is not implemented yet');
+        }
+
+        const { value: path } = pathOrId;
         const location = this.applyPathPrefix(path);
         const mimeType = await this.mimeTypeDetector.detectMimeTypeFromPath(location);
 
@@ -220,8 +267,14 @@ export class DropboxAdapter implements IFlysystemAdapter {
         ) as { mimeType: string };
     }
 
-    async move(source: string, destination: string, config?: Record<string, any> | undefined): Promise<void> {
-        const [fromPath, toPath] = [this.applyPathPrefix(source), this.applyPathPrefix(destination)];
+    async move(source: PathOrId, destination: PathOrId, config?: Record<string, any> | undefined): Promise<void> {
+        if (source.type !== 'id' || destination.type !== 'id') {
+            throw new FlysystemException('ById API is not implemented yet');
+        }
+
+        const { value: _source } = source;
+        const { value: _destination } = destination;
+        const [fromPath, toPath] = [this.applyPathPrefix(_source), this.applyPathPrefix(_destination)];
 
         try {
             await this.dbx.filesMoveV2({
@@ -233,7 +286,12 @@ export class DropboxAdapter implements IFlysystemAdapter {
         }
     }
 
-    async write(path: string, contents: string | Buffer, config?: VisibilityInterface | undefined): Promise<void> {
+    async write(pathOrId: PathOrId, contents: string | Buffer, config?: VisibilityInterface | undefined): Promise<void> {
+        if (pathOrId.type !== 'path') {
+            throw new FlysystemException('ById API is not implemented yet');
+        }
+
+        const { value: path } = pathOrId;
         const location = this.applyPathPrefix(path);
         const buff = typeof contents === 'string'
             ? Buffer.from(contents)
