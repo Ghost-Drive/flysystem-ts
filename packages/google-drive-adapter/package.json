@@ -1,0 +1,45 @@
+{
+  "name": "@flysystem-ts/google-drive-adapter",
+  "version": "0.2.4",
+  "description": "> TODO: description",
+  "author": "nik-selecto <n.moiseienko@selectoglobal.com>",
+  "homepage": "https://github.com/Ghost-Drive/flysystem-ts#readme",
+  "license": "ISC",
+  "main": "dist/index.js",
+  "typings": "dist/index.d.ts",
+  "directories": {
+    "lib": "dist",
+    "test": "__tests__"
+  },
+  "files": [
+    "dist"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Ghost-Drive/flysystem-ts.git"
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "test": "echo \"Error: run tests from root\" && exit 1"
+  },
+  "bugs": {
+    "url": "https://github.com/Ghost-Drive/flysystem-ts/issues"
+  },
+  "dependencies": {
+    "@flysystem-ts/adapter-interface": "^0.2.4",
+    "@flysystem-ts/common": "^0.2.3",
+    "add": "^2.0.6",
+    "build": "^0.1.4",
+    "googleapis": "^100.0.0",
+    "lerna": "^5.1.6",
+    "run": "^1.4.0"
+  },
+  "devDependencies": {
+    "@flysystem-ts/flysystem": "^0.2.4",
+    "dotenv": "^16.0.1"
+  },
+  "gitHead": "a566b42a9f49466a85ffa1cd1600c71a20635382"
+}

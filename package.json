@@ -1,0 +1,45 @@
+{
+  "name": "flysystem-ts",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "test": "npx jest",
+    "lint": "npx eslint --fix './packages/*/src/**/*.ts' './packages/*/__tests__/**/*.ts' './test.env.d.ts' ",
+    "prepare": "husky install",
+    "lerna:bootstrap": "node lerna-bootstrap.js"
+  },
+  "husky": {
+    "hooks": {
+      "pre-push": "npm test",
+      "pre-commit": "npm lint"
+    }
+  },
+  "config": {
+    "commitizen": {
+      "path": "cz-conventional-changelog"
+    }
+  },
+  "author": "n.moiseienko@selectoglobal.com",
+  "license": "ISC",
+  "description": "",
+  "devDependencies": {
+    "@jest/types": "^28.1.0",
+    "@types/jest": "^28.1.0",
+    "@types/node": "^17.0.38",
+    "@typescript-eslint/eslint-plugin": "^5.27.0",
+    "@typescript-eslint/parser": "^5.27.0",
+    "dotenv": "^16.0.1",
+    "eslint": "^8.16.0",
+    "eslint-config-airbnb-base": "^15.0.0",
+    "eslint-plugin-import": "^2.26.0",
+    "husky": "^8.0.1",
+    "jest": "^28.1.0",
+    "lerna": "^5.1.4",
+    "ts-jest": "^28.0.4",
+    "ts-node": "^10.8.1",
+    "typescript": "^4.7.2"
+  },
+  "dependencies": {
+    "dot-json": "^1.2.2"
+  }
+}

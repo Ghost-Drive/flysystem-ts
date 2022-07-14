@@ -1,0 +1,41 @@
+{
+  "name": "@flysystem-ts/common",
+  "version": "0.2.3",
+  "description": "> TODO: description",
+  "author": "nik-selecto <n.moiseienko@selectoglobal.com>",
+  "homepage": "https://github.com/Ghost-Drive/flysystem-ts#readme",
+  "license": "ISC",
+  "main": "dist/index.js",
+  "typings": "dist/index.d.ts",
+  "directories": {
+    "lib": "dist",
+    "test": "__tests__"
+  },
+  "files": [
+    "dist"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Ghost-Drive/flysystem-ts.git"
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "test": "echo \"Error: run tests from root\" && exit 1"
+  },
+  "bugs": {
+    "url": "https://github.com/Ghost-Drive/flysystem-ts/issues"
+  },
+  "dependencies": {
+    "file-type": "14",
+    "lodash": "^4.17.21",
+    "mime": "^3.0.0"
+  },
+  "devDependencies": {
+    "@types/lodash": "^4.14.182",
+    "@types/mime": "^2.0.3"
+  },
+  "gitHead": "a566b42a9f49466a85ffa1cd1600c71a20635382"
+}

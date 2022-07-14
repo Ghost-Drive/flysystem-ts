@@ -1,0 +1,43 @@
+{
+  "name": "@flysystem-ts/one-drive-adapter",
+  "version": "0.2.2",
+  "description": "> TODO: description",
+  "author": "nik-selecto <n.moiseienko@selectoglobal.com>",
+  "homepage": "https://github.com/Ghost-Drive/flysystem-ts#readme",
+  "license": "ISC",
+  "main": "dist/index.js",
+  "typings": "dist/index.d.ts",
+  "directories": {
+    "lib": "dist",
+    "test": "__tests__"
+  },
+  "files": [
+    "dist"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Ghost-Drive/flysystem-ts.git"
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "test": "echo \"Error: run tests from root\" && exit 1"
+  },
+  "devDependencies": {
+    "@flysystem-ts/flysystem": "^0.2.4",
+    "axios": "^0.27.2",
+    "dotenv": "^16.0.1",
+    "isomorphic-fetch": "^3.0.0",
+    "query-string": "^7.1.1"
+  },
+  "bugs": {
+    "url": "https://github.com/Ghost-Drive/flysystem-ts/issues"
+  },
+  "dependencies": {
+    "@flysystem-ts/adapter-interface": "^0.2.4",
+    "@flysystem-ts/common": "^0.2.3",
+    "@microsoft/microsoft-graph-client": "^3.0.2"
+  }
+}

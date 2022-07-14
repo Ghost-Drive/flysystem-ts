@@ -1,0 +1,11 @@
+node_modules
+dist
+
+packages/resources
+
+.test.env
+.env
+
+lerna-debug.log
+
+.idea
