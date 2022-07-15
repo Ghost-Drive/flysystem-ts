@@ -166,16 +166,17 @@ export class GoogleDriveAdapter implements IFlysystemAdapter {
     }
 
     async write(pathOrId: PathOrId, contents: string | Buffer, config?: VisibilityInterface | undefined) {
-        if (pathOrId.type !== 'path') {
-            throw new FlysystemException('ById API is not implemented yet');
-        }
+        const { type, value, parentId } = pathOrId;
+        let folderId = parentId;
+        let fileName = value;
 
-        const { value: path } = pathOrId;
-        const { folderId, folderPath, fileName } = await this.explorePath(path);
+        if (type === 'path') {
+            ({ folderId, fileName } = await this.explorePath(value) as { folderId: string, fileName: string});
+        }
 
         const nativeRes = await GoogleDriveApiExecutor
             .req(this.gDrive)
-            .filesCreateFromStream(folderId, fileName!, Readable.from(contents));
+            .filesCreateFromStream(folderId!, fileName, Readable.from(contents));
 
         return {
             id: nativeRes.data.id!,
