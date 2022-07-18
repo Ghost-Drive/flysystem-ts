@@ -1,9 +1,0 @@
-export const OPTION_VISIBILITY = 'visibility' as const;
-export const OPTION_DIRECTORY_VISIBILITY = 'directory_visibility' as const;
-export const ATTRIBUTE_PATH = 'path' as const;
-export const ATTRIBUTE_TYPE = 'type' as const;
-export const ATTRIBUTE_FILE_SIZE = 'file_size' as const;
-export const ATTRIBUTE_VISIBILITY = 'visibility' as const;
-export const ATTRIBUTE_LAST_MODIFIED = 'last_modified' as const;
-export const ATTRIBUTE_MIME_TYPE = 'mime_type' as const;
-export const ATTRIBUTE_EXTRA_METADATA = 'extra_metadata' as const;
