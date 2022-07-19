@@ -38,4 +38,20 @@ export class GDriveAdapter implements Adapter {
 
         return nativeToCommon(data);
     }
+
+    async mkdirById(options: {
+        parentId?: string,
+        name: string,
+    }): Promise<StorageItem> {
+        const { parentId, name } = options;
+        const { data } = await this.gDrive.files.create({
+            requestBody: {
+                mimeType: FOLDER_MIME_TYPE,
+                name,
+                ...(parentId && { parents: [parentId] }),
+            },
+        });
+
+        return nativeToCommon(data);
+    }
 }

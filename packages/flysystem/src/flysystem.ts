@@ -5,6 +5,17 @@ export class Flysystem {
     constructor(private adapter: Adapter) {}
 
     [MethodEnum.GET_BY_ID](id: string) {
-        return this.adapter.getById(id).catch(this.adapter.exceptionsPipe);
+        return this.adapter.getById(id).catch((error) => {
+            throw this.adapter.exceptionsPipe(error);
+        });
+    }
+
+    [MethodEnum.MKDIR_BY_ID](options: {
+        name: string,
+        parentId?: string
+    }) {
+        return this.adapter.mkdirById(options).catch((error) => {
+            throw this.adapter.exceptionsPipe(error);
+        });
     }
 }

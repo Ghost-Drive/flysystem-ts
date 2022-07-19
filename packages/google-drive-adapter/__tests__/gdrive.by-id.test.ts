@@ -10,7 +10,7 @@ config({ path: '.test.env' });
 
 const { GDRIVE_ACCESS } = process.env;
 
-describe('GDrive: .getById()', () => {
+describe('GDrive: by "id" strategy', () => {
     let flysystem: Flysystem;
     let origin: drive_v3.Drive;
     const originFiles: drive_v3.Schema$File[] = [];
@@ -38,5 +38,13 @@ describe('GDrive: .getById()', () => {
         const res = await flysystem.getById(item?.id || 'any-origin-files....');
 
         expect(res.id).toBe(item?.id);
+    });
+
+    it('Should create directory', async () => {
+        const res = await flysystem.mkdirById({
+            name: `hello-${new Date().getTime()}-world`,
+        });
+
+        expect(res.isFolder).toBe(true);
     });
 });
