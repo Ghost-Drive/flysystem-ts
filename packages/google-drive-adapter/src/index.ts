@@ -19,13 +19,17 @@ export class GDriveAdapter implements Adapter {
     }
 
     exceptionsPipe(error: any) {
-        if (!error?.error?.errors?.[0]?.reason) throw error;
-
-        return new FlysystemException(error.error.message, {
-            originalError: error.error.errors,
-            type: 'GoogleDrive Exception',
+        return new FlysystemException(error?.message || 'unknown error', {
+            originalError: error?.errors?.[0] || error,
+            type: ({
+                400: 'Bad request',
+                401: 'Invalid Credentials',
+                403: 'The limit of something is exceeded',
+                404: 'File not found',
+                429: 'Too many requests',
+            } as any)[error.code] || 'unknown',
             storage: 'GoogleDrive',
-            name: error.error.errors[0].reason,
+            name: error?.errors?.[0]?.reason || 'unknown',
         });
     }
 
