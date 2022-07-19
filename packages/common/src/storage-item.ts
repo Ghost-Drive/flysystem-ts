@@ -1,11 +1,11 @@
 export type StorageItem = {
-    id: string;
-    isFolder: string;
-    name?: string;
-    mimeType?: string;
-    size?: number;
-    trashed?: boolean;
-    parentFolderId?: string;
-    parentFolderName?: string;
-    path?: string;
+    id?: string | null;
+    isFolder?: boolean | null;
+    name?: string | null;
+    mimeType?: string | null;
+    size?: number | string | null;
+    trashed?: boolean | null;
+    parentFolderId?: string | null;
+    parentFolderName?: string | null;
+    path?: string | null;
 }
