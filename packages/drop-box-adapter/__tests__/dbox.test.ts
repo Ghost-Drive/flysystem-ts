@@ -25,9 +25,22 @@ describe('DBox by "id" strategy', () => {
         flysystem = new Flysystem(new DBoxAdapter(new Dropbox({ accessToken: DBX_ACCESS })));
     });
 
+    it('Should make directory', async () => {
+        const outsideFolder = `/out-root-${new Date().getTime()}`;
+        const { result: { metadata } } = await originSdk.filesCreateFolderV2({ path: outsideFolder });
+        const res = await flysystem.mkdirById({ name: `out-${new Date().getTime()}-folder` });
+
+        expect(res.id).toBeDefined();
+
+        const insideFolder = `in-${new Date().getTime()}`;
+        const { path } = await flysystem.mkdirById({ name: insideFolder, parentId: metadata.id });
+
+        expect(path).toBe(`${outsideFolder}/${insideFolder}`);
+    });
+
     it('Should return file metadata', async () => {
         const { result: { id: originId } } = await originSdk.filesUpload({
-            path: '/dbox-sdk.jpg',
+            path: `/dbox-sdk-${new Date().getTime()}.jpg`,
             contents: Buffer.from(readFileSync(TEST_PIC_PATH)),
         });
         const res = await flysystem.getById(originId);
@@ -49,7 +62,7 @@ describe('DBox by "id" strategy', () => {
         expect((result as any)['.tag']).toBe('deleted');
     });
 
-    it.only('Should not delete file permanently', async () => {
+    it('Should not delete file permanently', async () => {
         const { result: { id: originId, rev } } = await originSdk.filesUpload({
             path: '/dbox-sdk.jpg',
             contents: Buffer.from(readFileSync(TEST_PIC_PATH)),

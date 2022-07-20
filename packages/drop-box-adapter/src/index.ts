@@ -14,6 +14,9 @@ const nativeToCommon = (item: files.DeletedMetadataReference | files.FileMetadat
     size: (item as files.FileMetadataReference).size,
     parentFolderId: item.parent_shared_folder_id,
 });
+const slashResolver = (path: string) => (path.startsWith('/')
+    ? path
+    : `/${path}`);
 
 export class DBoxAdapter implements Adapter {
     constructor(private dBox: Dropbox) {}
@@ -24,11 +27,26 @@ export class DBoxAdapter implements Adapter {
         return nativeToCommon(result);
     }
 
-    [MethodEnum.MKDIR_BY_ID](options: {
+    async mkdirById(options: {
         name: string,
         parentId?: string,
     }): Promise<StorageItem> {
-        throw new Error('Thiw method is not implemented yet');
+        const { name, parentId } = options;
+        const location = parentId
+            ? await this.dBox.filesGetMetadata({ path: parentId })
+                .then(({ result: { path_lower } }) => `${path_lower}${slashResolver(name)}`)
+            : slashResolver(name);
+
+        const { result: { metadata } } = await this.dBox.filesCreateFolderV2({
+            path: location,
+        });
+
+        return {
+            id: metadata.id,
+            isFolder: true,
+            parentFolderId: metadata.parent_shared_folder_id,
+            path: metadata.path_lower,
+        };
     }
 
     [MethodEnum.UPLOAD_BY_ID](data: Buffer, metadata: {
