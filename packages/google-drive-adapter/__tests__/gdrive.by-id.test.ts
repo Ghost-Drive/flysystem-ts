@@ -17,20 +17,23 @@ const TEST_PIC_PATH = join(__dirname, '../../resources/photo-for-test.jpg');
 describe('GDrive: by "id" strategy', () => {
     let flysystem: Flysystem;
     let origin: drive_v3.Drive;
-    const originFiles: drive_v3.Schema$File[] = [];
+    const preIds: string[] = [];
 
     beforeAll(async () => {
         const auth: Auth.OAuth2Client = new google.auth.OAuth2();
 
         auth.setCredentials({ access_token: GDRIVE_ACCESS });
         origin = google.drive({ version: 'v3', auth });
-
-        const { data: { files } } = await origin.files.list({
-            q: '"root" in parents',
-            fields: 'files(id)',
-            pageSize: 1,
-        });
-        originFiles.push(...files!);
+        preIds.push(...[await Promise.all([
+            origin.files.create({
+                requestBody: {
+                    name: `test-file-${new Date().getTime()}.jpg`,
+                },
+                media: {
+                    body: Readable.from(readFileSync(TEST_PIC_PATH)),
+                },
+            }),
+        ])].map((f) => f[0].data.id!));
     });
 
     beforeEach(() => {
@@ -38,7 +41,7 @@ describe('GDrive: by "id" strategy', () => {
     });
 
     it('Should download file', async () => {
-        const data = await flysystem.downloadById(originFiles?.[0]?.id!);
+        const data = await flysystem.downloadById(preIds[0]);
 
         expect(data).toBeInstanceOf(Buffer);
     });
@@ -96,10 +99,10 @@ describe('GDrive: by "id" strategy', () => {
     });
 
     it('Should return file by id', async () => {
-        const item = originFiles.pop();
-        const res = await flysystem.getById(item?.id || 'any-origin-files....');
+        const preId = preIds.pop();
+        const res = await flysystem.getById(preId || 'any-origin-files....');
 
-        expect(res.id).toBe(item?.id);
+        expect(res.id).toBe(preId);
     });
 
     it('Should create directory', async () => {
