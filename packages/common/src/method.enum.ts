@@ -4,4 +4,5 @@ export enum MethodEnum {
     MKDIR_BY_ID = 'mkdirById',
     UPLOAD_BY_ID = 'uploadById',
     DELETE_BY_ID = 'deleteById',
+    DOWNLOAD_BY_ID = 'downloadById',
 }

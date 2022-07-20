@@ -15,4 +15,5 @@ export interface Adapter {
     }): Promise<StorageItem>;
     [MethodEnum.DELETE_BY_ID](id: string, soft: boolean): Promise<SuccessRes>;
     exceptionsPipe<E extends Error = Error>(error: E): FlysystemException,
+    [MethodEnum.DOWNLOAD_BY_ID](id: string): Promise<Buffer>;
 }

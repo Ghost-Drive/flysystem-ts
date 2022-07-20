@@ -7,7 +7,6 @@ import { drive_v3, google, Auth } from 'googleapis';
 import { join } from 'path';
 import { readFileSync } from 'fs';
 import { Readable } from 'stream';
-import { FlysystemException } from '@flysystem-ts/common';
 import { GDriveAdapter } from '../src/index';
 
 config({ path: '.test.env' });
@@ -36,6 +35,12 @@ describe('GDrive: by "id" strategy', () => {
 
     beforeEach(() => {
         flysystem = new Flysystem(new GDriveAdapter(origin));
+    });
+
+    it.only('Should download file', async () => {
+        const data = await flysystem.downloadById(originFiles?.[0]?.id!);
+
+        expect(data).toBeInstanceOf(Buffer);
     });
 
     it('Should delete file permanently', async () => {

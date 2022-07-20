@@ -34,4 +34,10 @@ export class Flysystem {
             throw this.adapter.exceptionsPipe(error);
         });
     }
+
+    [MethodEnum.DOWNLOAD_BY_ID](id: string) {
+        return this.adapter.downloadById(id).catch((error) => {
+            throw this.adapter.exceptionsPipe(error);
+        });
+    }
 }

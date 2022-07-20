@@ -34,6 +34,15 @@ export class GDriveAdapter implements Adapter {
         });
     }
 
+    async downloadById(id: string): Promise<Buffer> {
+        return this.gDrive.files.get({
+            fileId: id,
+            alt: 'media',
+        }, {
+            responseType: 'arraybuffer',
+        }).then(({ data }) => Buffer.from(data as any));
+    }
+
     async getById(id: string): Promise<StorageItem> {
         const { data } = await this.gDrive.files.get({ fileId: id });
 
