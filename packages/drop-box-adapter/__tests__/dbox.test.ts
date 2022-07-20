@@ -25,7 +25,7 @@ describe('DBox by "id" strategy', () => {
         flysystem = new Flysystem(new DBoxAdapter(new Dropbox({ accessToken: DBX_ACCESS })));
     });
 
-    it.only('Should download file', async () => {
+    it('Should download file', async () => {
         const { result: { id } } = await originSdk.filesUpload({
             path: `/pic-${new Date().getTime()}.jpg`,
             contents: readFileSync(TEST_PIC_PATH),
