@@ -4,6 +4,7 @@ import { Adapter } from '@flysystem-ts/adapter-interface';
 import {
     FlysystemException, MethodEnum, StorageItem, SuccessRes,
 } from '@flysystem-ts/common';
+import { DropboxResponseError } from 'dropbox';
 
 export class DBoxAdapter implements Adapter {
     [MethodEnum.GET_BY_ID](id: string): Promise<StorageItem> {
@@ -30,7 +31,19 @@ export class DBoxAdapter implements Adapter {
     }
 
     exceptionsPipe<E extends Error = Error>(error: E): FlysystemException {
-        throw new Error('Thiw method is not implemented yet');
+        if (error instanceof DropboxResponseError) {
+            return new FlysystemException(error.message, {
+                type: error.error,
+                storage: 'dropbox',
+                originalError: error,
+            });
+        }
+
+        return new FlysystemException('unknown error', {
+            type: 'unknown',
+            storage: 'dropbox',
+            originalError: error,
+        });
     }
 
     [MethodEnum.DOWNLOAD_BY_ID](id: string): Promise<Buffer> {
