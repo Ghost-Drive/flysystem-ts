@@ -32,8 +32,6 @@ describe('DBox by "id" strategy', () => {
         });
         const res = await flysystem.downloadById(id);
 
-        writeFileSync(join(__dirname, 'ok.jpg'), res);
-
         expect(res).toBeInstanceOf(Buffer);
         expect(res).not.toHaveLength(0);
     });
