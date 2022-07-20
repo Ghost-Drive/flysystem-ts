@@ -1,4 +1,6 @@
-import { FlysystemException, MethodEnum, StorageItem } from '@flysystem-ts/common';
+import {
+    FlysystemException, MethodEnum, StorageItem, SuccessRes,
+} from '@flysystem-ts/common';
 
 export interface Adapter {
     [MethodEnum.GET_BY_ID](id: string): Promise<StorageItem>,
@@ -11,5 +13,6 @@ export interface Adapter {
         parentId?: string,
         mimeType?: string,
     }): Promise<StorageItem>;
+    [MethodEnum.DELETE_BY_ID](id: string, soft: boolean): Promise<SuccessRes>;
     exceptionsPipe<E extends Error = Error>(error: E): FlysystemException,
 }

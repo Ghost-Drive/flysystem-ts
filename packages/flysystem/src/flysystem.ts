@@ -28,4 +28,10 @@ export class Flysystem {
             throw this.adapter.exceptionsPipe(error);
         });
     }
+
+    [MethodEnum.DELETE_BY_ID](id: string, soft = false) {
+        return this.adapter.deleteById(id, soft).catch((error) => {
+            throw this.adapter.exceptionsPipe(error);
+        });
+    }
 }

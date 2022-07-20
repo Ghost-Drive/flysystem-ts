@@ -6,6 +6,8 @@ import { Flysystem } from '@flysystem-ts/flysystem';
 import { drive_v3, google, Auth } from 'googleapis';
 import { join } from 'path';
 import { readFileSync } from 'fs';
+import { Readable } from 'stream';
+import { FlysystemException } from '@flysystem-ts/common';
 import { GDriveAdapter } from '../src/index';
 
 config({ path: '.test.env' });
@@ -34,6 +36,48 @@ describe('GDrive: by "id" strategy', () => {
 
     beforeEach(() => {
         flysystem = new Flysystem(new GDriveAdapter(origin));
+    });
+
+    it('Should delete file permanently', async () => {
+        const pic = readFileSync(TEST_PIC_PATH);
+        const name = `DELETE-${new Date().getTime()}.jpg`;
+        const originRes = await origin.files.create({
+            requestBody: {
+                name,
+            },
+            media: {
+                body: Readable.from(pic),
+            },
+        });
+        const fileId = originRes.data.id!;
+        const res = await flysystem.deleteById(fileId, false);
+
+        expect(res.success).toBe(true);
+
+        await expect(origin.files.get({ fileId }))
+            .rejects
+            .toThrowError('File not found');
+    });
+
+    it('Should delete file with "soft" option', async () => {
+        const pic = readFileSync(TEST_PIC_PATH);
+        const name = `SOFT-DELETE-${new Date().getTime()}.jpg`;
+        const originRes = await origin.files.create({
+            requestBody: {
+                name,
+            },
+            media: {
+                body: Readable.from(pic),
+            },
+        });
+        const fileId = originRes.data.id!;
+        const res = await flysystem.deleteById(fileId, true);
+
+        expect(res.success).toBe(true);
+
+        const originAfterRes = await origin.files.get({ fileId, fields: 'trashed' });
+
+        expect(originAfterRes.data.trashed).toBe(true);
     });
 
     it('Should upload file', async () => {

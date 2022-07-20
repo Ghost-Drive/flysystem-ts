@@ -1,5 +1,5 @@
 import { Adapter } from '@flysystem-ts/adapter-interface';
-import { FlysystemException, StorageItem } from '@flysystem-ts/common';
+import { FlysystemException, StorageItem, SuccessRes } from '@flysystem-ts/common';
 import { drive_v3 } from 'googleapis';
 import { Readable } from 'stream';
 
@@ -79,6 +79,21 @@ export class GDriveAdapter implements Adapter {
             name: res.name,
             size: res.size,
             ...(res.parents?.[0] && { parentFolderId: res.parents[0] }),
+        };
+    }
+
+    async deleteById(id: string, soft = false): Promise<SuccessRes> {
+        const res = soft
+            ? await this.gDrive.files.update({
+                fileId: id,
+                requestBody: {
+                    trashed: true,
+                },
+            })
+            : await this.gDrive.files.delete({ fileId: id });
+
+        return {
+            success: res.status < 400,
         };
     }
 }
