@@ -49,12 +49,29 @@ export class DBoxAdapter implements Adapter {
         };
     }
 
-    [MethodEnum.UPLOAD_BY_ID](data: Buffer, metadata: {
+    async uploadById(data: Buffer, metadata: {
         name: string,
         parentId?: string,
         mimeType?: string,
     }): Promise<StorageItem> {
-        throw new Error('Thiw method is not implemented yet');
+        const { name, parentId } = metadata;
+        const parentPath = parentId
+            ? (await this.getById(parentId)).path
+            : '';
+        const path = `${parentPath}${slashResolver(name)}`;
+        const { result } = await this.dBox.filesUpload({
+            path,
+            contents: data,
+        });
+
+        return {
+            id: result.id,
+            isFolder: false,
+            size: result.size,
+            parentFolderId: result.parent_shared_folder_id,
+            path,
+            name: result.name,
+        };
     }
 
     async deleteById(id: string, soft: boolean): Promise<SuccessRes> {
@@ -87,7 +104,10 @@ export class DBoxAdapter implements Adapter {
         });
     }
 
-    [MethodEnum.DOWNLOAD_BY_ID](id: string): Promise<Buffer> {
-        throw new Error('Thiw method is not implemented yet');
+    async downloadById(id: string): Promise<Buffer> {
+        const { result } = await this.dBox.filesDownload({ path: id });
+
+        // TODO
+        return (result as any).fileBinary;
     }
 }

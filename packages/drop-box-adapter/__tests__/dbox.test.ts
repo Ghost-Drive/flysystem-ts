@@ -25,6 +25,22 @@ describe('DBox by "id" strategy', () => {
         flysystem = new Flysystem(new DBoxAdapter(new Dropbox({ accessToken: DBX_ACCESS })));
     });
 
+    it('Should upload file', async () => {
+        const uploadsFolder = `/test-uploads-${new Date().getTime()}`;
+        const { result: { metadata } } = await originSdk.filesCreateFolderV2({ path: uploadsFolder });
+        const data = readFileSync(TEST_PIC_PATH);
+        const data2 = Buffer.from(data);
+        const res = await flysystem.uploadById(data, {
+            name: 'out-pic.jpg',
+        });
+        expect(res.id).toBeDefined();
+        const res2 = await flysystem.uploadById(data2, {
+            name: 'in-pic.jpg',
+            parentId: metadata.id,
+        });
+        expect(res2.id).toBeDefined();
+    });
+
     it('Should make directory', async () => {
         const outsideFolder = `/out-root-${new Date().getTime()}`;
         const { result: { metadata } } = await originSdk.filesCreateFolderV2({ path: outsideFolder });
