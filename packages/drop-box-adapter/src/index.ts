@@ -39,8 +39,18 @@ export class DBoxAdapter implements Adapter {
         throw new Error('Thiw method is not implemented yet');
     }
 
-    [MethodEnum.DELETE_BY_ID](id: string, soft: boolean): Promise<SuccessRes> {
-        throw new Error('Thiw method is not implemented yet');
+    async deleteById(id: string, soft: boolean): Promise<SuccessRes> {
+        let result;
+
+        if (soft) {
+            ({ result } = await this.dBox.filesDeleteV2({ path: id }));
+        } else {
+            ({ result } = await this.dBox.filesPermanentlyDelete({ path: id }));
+        }
+
+        return {
+            success: !!result?.metadata,
+        };
     }
 
     exceptionsPipe<E extends Error = Error>(error: E): FlysystemException {

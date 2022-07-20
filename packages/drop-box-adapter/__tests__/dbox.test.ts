@@ -34,4 +34,38 @@ describe('DBox by "id" strategy', () => {
 
         expect(res.id).toBe(originId);
     });
+
+    it('Should make "soft" delete', async () => {
+        const { result: { id: originId, rev } } = await originSdk.filesUpload({
+            path: '/dbox-sdk.jpg',
+            contents: Buffer.from(readFileSync(TEST_PIC_PATH)),
+        });
+        const res = await flysystem.deleteById(originId, true);
+
+        expect(res.success).toBe(true);
+
+        const { result } = await originSdk.filesGetMetadata({ path: originId, include_deleted: true });
+
+        expect((result as any)['.tag']).toBe('deleted');
+    });
+
+    it.only('Should not delete file permanently', async () => {
+        const { result: { id: originId, rev } } = await originSdk.filesUpload({
+            path: '/dbox-sdk.jpg',
+            contents: Buffer.from(readFileSync(TEST_PIC_PATH)),
+        });
+
+        let error;
+
+        try {
+            const res = await flysystem.deleteById(originId, false);
+
+            expect(res.success).toBe(true);
+        } catch (err: any) {
+            expect(err.name).toBe('FLYSYSTEM_EXCEPTION');
+            error = err;
+        }
+
+        expect(error).toBeDefined();
+    });
 });
