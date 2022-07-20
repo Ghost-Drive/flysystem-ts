@@ -36,6 +36,7 @@
   },
   "gitHead": "a566b42a9f49466a85ffa1cd1600c71a20635382",
   "devDependencies": {
-    "@flysystem-ts/flysystem": "^0.2.4"
+    "@flysystem-ts/flysystem": "^0.2.4",
+    "dotenv": "^16.0.1"
   }
 }

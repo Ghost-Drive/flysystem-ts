@@ -4,11 +4,24 @@ import { Adapter } from '@flysystem-ts/adapter-interface';
 import {
     FlysystemException, MethodEnum, StorageItem, SuccessRes,
 } from '@flysystem-ts/common';
-import { DropboxResponseError } from 'dropbox';
+import { Dropbox, DropboxResponseError, files } from 'dropbox';
+
+const nativeToCommon = (item: files.DeletedMetadataReference | files.FileMetadataReference | files.FolderMetadataReference): StorageItem => ({
+    id: (item as files.FileMetadataReference).id,
+    name: (item as files.FileMetadataReference).name,
+    isFolder: item['.tag'] === 'folder',
+    path: item.path_lower,
+    size: (item as files.FileMetadataReference).size,
+    parentFolderId: item.parent_shared_folder_id,
+});
 
 export class DBoxAdapter implements Adapter {
-    [MethodEnum.GET_BY_ID](id: string): Promise<StorageItem> {
-        throw new Error('Thiw method is not implemented yet');
+    constructor(private dBox: Dropbox) {}
+
+    async getById(id: string): Promise<StorageItem> {
+        const { result } = await this.dBox.filesGetMetadata({ path: id });
+
+        return nativeToCommon(result);
     }
 
     [MethodEnum.MKDIR_BY_ID](options: {
