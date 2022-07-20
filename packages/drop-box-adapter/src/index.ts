@@ -2,7 +2,7 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { Adapter } from '@flysystem-ts/adapter-interface';
 import {
-    FlysystemException, MethodEnum, StorageItem, SuccessRes,
+    FlysystemException, StorageItem, SuccessRes,
 } from '@flysystem-ts/common';
 import { Dropbox, DropboxResponseError, files } from 'dropbox';
 
