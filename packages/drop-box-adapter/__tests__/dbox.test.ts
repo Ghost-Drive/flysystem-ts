@@ -4,7 +4,7 @@
 import { Dropbox } from 'dropbox';
 import { Flysystem } from '@flysystem-ts/flysystem';
 import { config } from 'dotenv';
-import { readFileSync } from 'fs';
+import { readFileSync, writeFileSync } from 'fs';
 import { join } from 'path';
 import { DBoxAdapter } from '../src';
 
@@ -23,6 +23,19 @@ describe('DBox by "id" strategy', () => {
 
     beforeEach(async () => {
         flysystem = new Flysystem(new DBoxAdapter(new Dropbox({ accessToken: DBX_ACCESS })));
+    });
+
+    it.only('Should download file', async () => {
+        const { result: { id } } = await originSdk.filesUpload({
+            path: `/pic-${new Date().getTime()}.jpg`,
+            contents: readFileSync(TEST_PIC_PATH),
+        });
+        const res = await flysystem.downloadById(id);
+
+        writeFileSync(join(__dirname, 'ok.jpg'), res);
+
+        expect(res).toBeInstanceOf(Buffer);
+        expect(res).not.toHaveLength(0);
     });
 
     it('Should upload file', async () => {
