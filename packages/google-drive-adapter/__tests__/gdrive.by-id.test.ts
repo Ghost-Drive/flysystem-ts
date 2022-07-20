@@ -37,7 +37,7 @@ describe('GDrive: by "id" strategy', () => {
         flysystem = new Flysystem(new GDriveAdapter(origin));
     });
 
-    it.only('Should download file', async () => {
+    it('Should download file', async () => {
         const data = await flysystem.downloadById(originFiles?.[0]?.id!);
 
         expect(data).toBeInstanceOf(Buffer);
