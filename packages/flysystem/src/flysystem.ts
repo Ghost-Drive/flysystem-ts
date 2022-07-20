@@ -1,16 +1,15 @@
 import { Adapter } from '@flysystem-ts/adapter-interface';
-import { MethodEnum } from '@flysystem-ts/common';
 
 export class Flysystem {
     constructor(private adapter: Adapter) {}
 
-    [MethodEnum.GET_BY_ID](id: string) {
+    getById(id: string) {
         return this.adapter.getById(id).catch((error) => {
             throw this.adapter.exceptionsPipe(error);
         });
     }
 
-    [MethodEnum.MKDIR_BY_ID](options: {
+    mkdirById(options: {
         name: string,
         parentId?: string
     }) {
@@ -19,7 +18,7 @@ export class Flysystem {
         });
     }
 
-    [MethodEnum.UPLOAD_BY_ID](data: Buffer, metadata: {
+    uploadById(data: Buffer, metadata: {
         name: string,
         mimeType?: string,
         parentId?: string,
@@ -29,13 +28,13 @@ export class Flysystem {
         });
     }
 
-    [MethodEnum.DELETE_BY_ID](id: string, soft = false) {
+    deleteById(id: string, soft = false) {
         return this.adapter.deleteById(id, soft).catch((error) => {
             throw this.adapter.exceptionsPipe(error);
         });
     }
 
-    [MethodEnum.DOWNLOAD_BY_ID](id: string) {
+    downloadById(id: string) {
         return this.adapter.downloadById(id).catch((error) => {
             throw this.adapter.exceptionsPipe(error);
         });
