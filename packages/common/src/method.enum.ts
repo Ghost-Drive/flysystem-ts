@@ -2,4 +2,5 @@
 export enum MethodEnum {
     GET_BY_ID = 'getById',
     MKDIR_BY_ID = 'mkdirById',
+    UPLOAD_BY_ID = 'uploadById'
 }

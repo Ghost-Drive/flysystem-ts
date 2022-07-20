@@ -4,11 +4,14 @@
 import { config } from 'dotenv';
 import { Flysystem } from '@flysystem-ts/flysystem';
 import { drive_v3, google, Auth } from 'googleapis';
+import { join } from 'path';
+import { readFileSync } from 'fs';
 import { GDriveAdapter } from '../src/index';
 
 config({ path: '.test.env' });
 
 const { GDRIVE_ACCESS } = process.env;
+const TEST_PIC_PATH = join(__dirname, '../../resources/photo-for-test.jpg');
 
 describe('GDrive: by "id" strategy', () => {
     let flysystem: Flysystem;
@@ -31,6 +34,16 @@ describe('GDrive: by "id" strategy', () => {
 
     beforeEach(() => {
         flysystem = new Flysystem(new GDriveAdapter(origin));
+    });
+
+    it('Should upload file', async () => {
+        const pic = readFileSync(TEST_PIC_PATH);
+        const name = `measter3-testing-${new Date().getTime()}.jpg`;
+        const res = await flysystem.uploadById(Buffer.from(pic), {
+            name,
+        });
+
+        expect(res.name).toBe(name);
     });
 
     it('Should return file by id', async () => {

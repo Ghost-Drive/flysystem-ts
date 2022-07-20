@@ -18,4 +18,14 @@ export class Flysystem {
             throw this.adapter.exceptionsPipe(error);
         });
     }
+
+    [MethodEnum.UPLOAD_BY_ID](data: Buffer, metadata: {
+        name: string,
+        mimeType?: string,
+        parentId?: string,
+    }) {
+        return this.adapter.uploadById(data, metadata).catch((error) => {
+            throw this.adapter.exceptionsPipe(error);
+        });
+    }
 }

@@ -6,5 +6,10 @@ export interface Adapter {
         name: string,
         parentId?: string,
     }): Promise<StorageItem>;
+    [MethodEnum.UPLOAD_BY_ID](data: Buffer, metadata: {
+        name: string,
+        parentId?: string,
+        mimeType?: string,
+    }): Promise<StorageItem>;
     exceptionsPipe<E extends Error = Error>(error: E): FlysystemException,
 }

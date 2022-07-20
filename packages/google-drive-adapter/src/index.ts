@@ -1,6 +1,7 @@
 import { Adapter } from '@flysystem-ts/adapter-interface';
 import { FlysystemException, StorageItem } from '@flysystem-ts/common';
 import { drive_v3 } from 'googleapis';
+import { Readable } from 'stream';
 
 export const FOLDER_MIME_TYPE = 'application/vnd.google-apps.folder' as const;
 
@@ -53,5 +54,31 @@ export class GDriveAdapter implements Adapter {
         });
 
         return nativeToCommon(data);
+    }
+
+    async uploadById(data: Buffer, metadata: {
+        name: string,
+        parentId?: string,
+        mimeType?: string,
+    }): Promise<StorageItem> {
+        const { name, parentId, mimeType } = metadata;
+        const { data: res } = await this.gDrive.files.create({
+            requestBody: {
+                name,
+                ...(parentId && { parents: [parentId] }),
+            },
+            media: {
+                ...(mimeType && { mimeType }),
+                body: Readable.from(data),
+            },
+        });
+
+        return {
+            id: res.id,
+            isFolder: res.mimeType === FOLDER_MIME_TYPE,
+            name: res.name,
+            size: res.size,
+            ...(res.parents?.[0] && { parentFolderId: res.parents[0] }),
+        };
     }
 }
