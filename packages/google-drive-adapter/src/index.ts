@@ -80,6 +80,7 @@ export class GDriveAdapter implements Adapter {
                 ...(mimeType && { mimeType }),
                 body: Readable.from(data),
             },
+            fields: 'id,size,name,mimeType,parents',
         });
 
         return {

@@ -7,7 +7,7 @@ import { drive_v3, google, Auth } from 'googleapis';
 import { join } from 'path';
 import { readFileSync } from 'fs';
 import { Readable } from 'stream';
-import { GDriveAdapter } from '../src/index';
+import { FOLDER_MIME_TYPE, GDriveAdapter } from '../src/index';
 
 config({ path: '.test.env' });
 
@@ -86,6 +86,24 @@ describe('GDrive: by "id" strategy', () => {
         const originAfterRes = await origin.files.get({ fileId, fields: 'trashed' });
 
         expect(originAfterRes.data.trashed).toBe(true);
+    });
+
+    it('Should upload file in specific folder', async () => {
+        const pic = readFileSync(TEST_PIC_PATH);
+        const name = `measter3-testing-${new Date().getTime()}.jpg`;
+        const { data: { id } } = await origin.files.create({
+            requestBody: {
+                mimeType: FOLDER_MIME_TYPE,
+                name: `uploads-here-${new Date().getTime()}`,
+            },
+            fields: 'id',
+        });
+        const res = await flysystem.uploadById(Buffer.from(pic), {
+            name,
+            parentId: id!,
+        });
+
+        expect(res?.parentFolderId).toBe(id);
     });
 
     it('Should upload file', async () => {
