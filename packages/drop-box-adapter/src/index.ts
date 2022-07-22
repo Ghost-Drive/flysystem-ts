@@ -2,7 +2,14 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { Adapter } from '@flysystem-ts/adapter-interface';
 import {
-    FlysystemException, StorageItem, SuccessRes,
+    DeleteById,
+    DownloadById,
+    FlysystemException,
+    GetById,
+    MakeDirById,
+    StorageItem,
+    SuccessRes,
+    UploadById,
 } from '@flysystem-ts/common';
 import { Dropbox, DropboxResponseError, files } from 'dropbox';
 
@@ -18,7 +25,7 @@ const slashResolver = (path: string) => (path.startsWith('/')
     ? path
     : `/${path}`);
 
-export class DBoxAdapter implements Adapter {
+export class DBoxAdapter implements Adapter, GetById, MakeDirById, DeleteById, UploadById, DownloadById {
     constructor(private dBox: Dropbox) {}
 
     async getById(id: string): Promise<StorageItem> {

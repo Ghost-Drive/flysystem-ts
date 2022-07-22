@@ -1,5 +1,13 @@
 import { Adapter } from '@flysystem-ts/adapter-interface';
-import { FlysystemException, StorageItem, SuccessRes } from '@flysystem-ts/common';
+import {
+    DeleteById, DownloadById,
+    FlysystemException,
+    GetById,
+    MakeDirById,
+    StorageItem,
+    SuccessRes,
+    UploadById
+} from '@flysystem-ts/common';
 import { drive_v3 } from 'googleapis';
 import { Readable } from 'stream';
 
@@ -15,7 +23,7 @@ const nativeToCommon = (item: drive_v3.Schema$File): StorageItem => ({
     parentFolderId: item?.parents?.[0],
 });
 
-export class GDriveAdapter implements Adapter {
+export class GDriveAdapter implements Adapter, GetById, MakeDirById, DeleteById, UploadById, DownloadById {
     constructor(private gDrive: drive_v3.Drive) {
     }
 

@@ -14,7 +14,7 @@ const { DBX_ACCESS } = process.env;
 const TEST_PIC_PATH = join(__dirname, '../../resources/photo-for-test.jpg');
 
 describe('DBox by "id" strategy', () => {
-    let flysystem: Flysystem;
+    let flysystem: DBoxAdapter;
     let originSdk: Dropbox;
 
     beforeAll(async () => {
@@ -22,7 +22,7 @@ describe('DBox by "id" strategy', () => {
     });
 
     beforeEach(async () => {
-        flysystem = new Flysystem(new DBoxAdapter(new Dropbox({ accessToken: DBX_ACCESS })));
+        flysystem = Flysystem.init<DBoxAdapter>(new DBoxAdapter(new Dropbox({ accessToken: DBX_ACCESS })));
     });
 
     it('Should download file', async () => {

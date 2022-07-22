@@ -1,7 +1,18 @@
 import { Adapter } from '@flysystem-ts/adapter-interface';
+import {
+    DeleteById, DownloadById, GetById, MakeDirById, UploadById,
+} from '@flysystem-ts/common';
+
+type FullAdapter = Adapter & GetById & DeleteById & UploadById & DownloadById & MakeDirById;
 
 export class Flysystem {
-    constructor(private adapter: Adapter) {}
+    private constructor(private adapter: FullAdapter) {}
+
+    public static init<
+        T extends Partial<Omit<FullAdapter, 'exceptionsPipe'>> & Adapter
+    >(adapter: T) {
+        return new Flysystem(adapter as unknown as FullAdapter) as unknown as Omit<T, 'exceptionsPipe'>;
+    }
 
     getById(id: string) {
         return this.adapter.getById(id).catch((error) => {
