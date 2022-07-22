@@ -1,11 +1,6 @@
 # `@flysystem-ts/common`
+# [Home](../../README.md)
 
-> TODO: description
+## This package is contains common interfaces, types for full project usage 
 
-## Usage
-
-```
-const common = require('@flysystem-ts/common');
-
-// TODO: DEMONSTRATE API
-```
+// TODO complete README

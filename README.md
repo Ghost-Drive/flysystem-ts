@@ -76,11 +76,11 @@ Recently such methods are allowed to be implemented in adapter:
 import { Dropbox } from 'dropbox';
 import { google } from 'googleapis';
 import { Flysystem } from '@flysystem-ts/flysystem';
-import { DropBoxAdapter } from '@flysystem-ts/drop-box-adapter';
+import { DBoxAdapter } from '@flysystem-ts/drop-box-adapter';
 import { GDriveAdapter } from '@flysystem-ts/google-drive-adapter';
 
-const dBoxAdapter = new DropBoxAdapter(new Dropbox());
-const dBoxFlysystem = Flysystem.init<DropBoxAdapter>(dBoxAdapter);
+const dBoxAdapter = new DBoxAdapter(new Dropbox());
+const dBoxFlysystem = Flysystem.init<DBoxAdapter>(dBoxAdapter);
 const gDriveFlysystem = Flysystem.init<GDriveAdapter>(google.drive({ version: 'v3', auth: new google.auth.OAuth2() }));
 
 Promise.all([

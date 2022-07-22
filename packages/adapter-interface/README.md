@@ -1,11 +1,6 @@
-# `@flysystem/adapter-interface`
+# `@flysystem-ts/adapter-interface`
+# [Home](../../README.md)
 
-> TODO: description
+## This package is contains minimum adapter interface definition and optional interfaces for each method that may be implemented
 
-## Usage
-
-```
-const adapterInterface = require('@flysystem/adapter-interface');
-
-// TODO: DEMONSTRATE API
-```
+// TODO complete README
