@@ -6,7 +6,7 @@ import {
     MakeDirById,
     StorageItem,
     SuccessRes,
-    UploadById
+    UploadById,
 } from '@flysystem-ts/common';
 import { drive_v3 } from 'googleapis';
 import { Readable } from 'stream';
