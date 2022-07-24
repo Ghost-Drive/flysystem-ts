@@ -6,7 +6,7 @@
     "test": "npx jest",
     "lint": "npx eslint --fix './packages/*/src/**/*.ts' './packages/*/__tests__/**/*.ts' './test.env.d.ts' ",
     "prepare": "husky install",
-    "lerna:bootstrap": "node lerna-bootstrap.js"
+    "lerna:bootstrap": "bash ./lerna.bootstrap.sh"
   },
   "husky": {
     "hooks": {

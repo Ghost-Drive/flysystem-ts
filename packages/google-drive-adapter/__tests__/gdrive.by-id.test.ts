@@ -15,7 +15,7 @@ const { GDRIVE_ACCESS } = process.env;
 const TEST_PIC_PATH = join(__dirname, '../../resources/photo-for-test.jpg');
 
 describe('GDrive: by "id" strategy', () => {
-    let flysystem: GDriveAdapter;
+    let flysystem: Omit<GDriveAdapter, 'exceptionsPipe'>;
     let origin: drive_v3.Drive;
     const preIds: string[] = [];
 

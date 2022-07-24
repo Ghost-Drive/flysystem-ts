@@ -14,7 +14,7 @@ const { DBX_ACCESS } = process.env;
 const TEST_PIC_PATH = join(__dirname, '../../resources/photo-for-test.jpg');
 
 describe('DBox by "id" strategy', () => {
-    let flysystem: DBoxAdapter;
+    let flysystem: Omit<DBoxAdapter, 'exceptionsPipe'>;
     let originSdk: Dropbox;
 
     beforeAll(async () => {
