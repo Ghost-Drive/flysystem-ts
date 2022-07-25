@@ -1,6 +1,6 @@
 {
   "name": "@flysystem-ts/one-drive-adapter",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "description": "> TODO: description",
   "author": "nik-selecto <n.moiseienko@selectoglobal.com>",
   "homepage": "https://github.com/Ghost-Drive/flysystem-ts#readme",
@@ -26,7 +26,7 @@
     "test": "echo \"Error: run tests from root\" && exit 1"
   },
   "devDependencies": {
-    "@flysystem-ts/flysystem": "^1.1.0",
+    "@flysystem-ts/flysystem": "^1.2.0",
     "axios": "^0.27.2",
     "dotenv": "^16.0.1",
     "isomorphic-fetch": "^3.0.0",
@@ -36,8 +36,8 @@
     "url": "https://github.com/Ghost-Drive/flysystem-ts/issues"
   },
   "dependencies": {
-    "@flysystem-ts/adapter-interface": "^1.1.0",
-    "@flysystem-ts/common": "^1.1.0",
+    "@flysystem-ts/adapter-interface": "^1.2.0",
+    "@flysystem-ts/common": "^1.2.0",
     "@microsoft/microsoft-graph-client": "^3.0.2"
   }
 }
