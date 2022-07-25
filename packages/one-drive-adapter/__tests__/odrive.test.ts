@@ -4,7 +4,7 @@ import { Flysystem } from '@flysystem-ts/flysystem';
 import { join } from 'path';
 import { config } from 'dotenv';
 import { Client, Options } from '@microsoft/microsoft-graph-client';
-import { readFileSync } from 'fs';
+import { readFileSync, writeFileSync } from 'fs';
 import { OneDriveAdapter } from '../src';
 
 config({ path: '.test.env' });
@@ -26,11 +26,19 @@ describe('OneDriveAdapter package testing', () => {
         flysystem = Flysystem.init(new OneDriveAdapter(origin));
     });
 
+    it('Should download file', async () => {
+        const pic = readFileSync(TEST_PIC_PATH);
+        const { id } = await origin.api(`/me/drive/root:/test-pic-${new Date().getTime()}:/content`).put(pic);
+        const res = await flysystem.downloadById(id);
+
+        expect(res.length).toBe(pic.length);
+    });
+
     it('Should upload to the specific folder', async () => {
         const pic = readFileSync(TEST_PIC_PATH);
         const { id: parentId } = await origin.api('/me/drive/root/children').post({
             folder: {},
-            name: `test-folder-for-pic-${new Date().getTime()}`,
+            name: `test-folder-for-pic-${new Date().getTime()}.jpg`,
         });
         const res = await flysystem.uploadById(pic, {
             name: `test-pic-in-folder-${new Date().getTime()}`,
