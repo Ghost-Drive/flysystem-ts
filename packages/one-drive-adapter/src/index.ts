@@ -1,26 +1,65 @@
 import { Adapter } from '@flysystem-ts/adapter-interface';
-import { FlysystemException, MakeDirById, StorageItem } from '@flysystem-ts/common';
+import {
+    DeleteById, FlysystemException, MakeDirById, StorageItem, SuccessRes,
+} from '@flysystem-ts/common';
 import { Client } from '@microsoft/microsoft-graph-client';
 import 'isomorphic-fetch';
+import { OneDriveItem } from './one-drive-item.interface';
 
-export class OneDriveAdapter implements Adapter, MakeDirById {
+function nativeToCommon(item: OneDriveItem): StorageItem {
+    const {
+        id, name, parentReference, folder, size, deleted,
+    } = item;
+
+    return {
+        id,
+        name,
+        ...(parentReference && {
+            path: parentReference.path,
+            parentFolderId: parentReference.id,
+            parentFolderName: parentReference.path.split('/').at(-1),
+        }),
+        size,
+        trashed: !!deleted,
+        isFolder: !!folder,
+    };
+}
+
+export class OneDriveAdapter implements Adapter, MakeDirById, DeleteById {
     constructor(private msClient: Client) {}
 
-    mkdirById(options: {
+    async deleteById(id: string, soft: boolean): Promise<SuccessRes> {
+        if (!soft) {
+            throw new FlysystemException('Only "soft"=true deletion is supported', {
+                type: 'Unsupported flag',
+                storage: 'OneDrive',
+            });
+        }
+
+        await this.msClient.api(`/me/drive/items/${id}`).delete();
+
+        return {
+            success: true,
+        };
+    }
+
+    async mkdirById(options: {
         name: string,
         parentId?: string,
     }): Promise<StorageItem> {
         const { name, parentId } = options;
-
-        return this
+        const graph = parentId
+            ? `/me/drive/items/${parentId}/children`
+            : `/me/drive/root/children`;
+        const res = await this
             .msClient
-            .api(`/drive/root/${parentId
-                ? parentId.replace(/^\//, '')
-                : '/children'}`)
+            .api(graph)
             .post({
                 name,
                 folder: { },
-            })as Promise<any>;
+            });
+
+        return nativeToCommon(res);
     }
 
     exceptionsPipe(error: any): FlysystemException {

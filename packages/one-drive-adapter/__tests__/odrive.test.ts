@@ -25,12 +25,36 @@ describe('OneDriveAdapter package testing', () => {
         flysystem = Flysystem.init(new OneDriveAdapter(origin));
     });
 
-    it.only('Should create folder', async () => {
+    it('Should create folder inside parent by its "id"', async () => {
+        const { id: parentId } = await origin.api('/me/drive/root/children').post({
+            folder: {},
+            name: `TEST-PARENT-${new Date().getTime()}-FOLDER`,
+        });
         const res = await flysystem.mkdirById({
-            name: `folder-${new Date().getTime()}`,
+            name: `test-child-${new Date().getTime()}-folder`,
+            parentId,
         });
 
-        console.log(res);
+        expect(parentId).toBe(res.parentFolderId);
+    });
+
+    it('Should delete folder', async () => {
+        const { id } = await origin.api('/me/drive/root/children').post({
+            folder: {},
+            name: `should-be-deleted ${new Date().getTime()}`,
+        });
+        const res = await flysystem.deleteById(id, true);
+
+        expect(res.success).toBe(true);
+    });
+
+    it('Should create folder at the "root" level', async () => {
+        const res = await flysystem.mkdirById({
+            name: `TEST-${new Date().getTime()}-FOLDER`,
+        });
+
+        expect(res.id).toBeDefined();
+        expect(res.isFolder).toBe(true);
     });
 
     it('Should authenticate to OneDrive', async () => {
