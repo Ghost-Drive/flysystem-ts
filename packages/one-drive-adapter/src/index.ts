@@ -1,9 +1,10 @@
 import { Adapter } from '@flysystem-ts/adapter-interface';
 import {
-    DeleteById, FlysystemException, MakeDirById, StorageItem, SuccessRes,
+    DeleteById, FlysystemException, MakeDirById, StorageItem, SuccessRes, UploadById,
 } from '@flysystem-ts/common';
 import { Client } from '@microsoft/microsoft-graph-client';
 import 'isomorphic-fetch';
+import * as Buffer from 'buffer';
 import { OneDriveItem } from './one-drive-item.interface';
 
 function nativeToCommon(item: OneDriveItem): StorageItem {
@@ -25,8 +26,22 @@ function nativeToCommon(item: OneDriveItem): StorageItem {
     };
 }
 
-export class OneDriveAdapter implements Adapter, MakeDirById, DeleteById {
+export class OneDriveAdapter implements Adapter, MakeDirById, DeleteById, UploadById {
     constructor(private msClient: Client) {}
+
+    async uploadById(data: Buffer, options: {
+        name: string,
+        parentId?: string,
+        mimeType?: string,
+    }): Promise<StorageItem> {
+        const { name, parentId } = options;
+        const graph = parentId
+            ? `/me/drive/items/${parentId}:/${name}:/content`
+            : `/me/drive/root:/${name}:/content`;
+        const res = await this.msClient.api(graph).put(data);
+
+        return nativeToCommon(res);
+    }
 
     async deleteById(id: string, soft: boolean): Promise<SuccessRes> {
         if (!soft) {

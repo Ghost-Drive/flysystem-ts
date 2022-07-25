@@ -4,6 +4,7 @@ import { Flysystem } from '@flysystem-ts/flysystem';
 import { join } from 'path';
 import { config } from 'dotenv';
 import { Client, Options } from '@microsoft/microsoft-graph-client';
+import { readFileSync } from 'fs';
 import { OneDriveAdapter } from '../src';
 
 config({ path: '.test.env' });
@@ -23,6 +24,29 @@ describe('OneDriveAdapter package testing', () => {
         });
 
         flysystem = Flysystem.init(new OneDriveAdapter(origin));
+    });
+
+    it('Should upload to the specific folder', async () => {
+        const pic = readFileSync(TEST_PIC_PATH);
+        const { id: parentId } = await origin.api('/me/drive/root/children').post({
+            folder: {},
+            name: `test-folder-for-pic-${new Date().getTime()}`,
+        });
+        const res = await flysystem.uploadById(pic, {
+            name: `test-pic-in-folder-${new Date().getTime()}`,
+            parentId,
+        });
+
+        expect(res.parentFolderId).toBe(parentId);
+    });
+
+    it('Should upload to the root folder', async () => {
+        const pic = readFileSync(TEST_PIC_PATH);
+        const res = await flysystem.uploadById(pic, {
+            name: `test-pic-${new Date().getTime()}.jpg`,
+        });
+
+        expect(res.path).toMatch(/root/);
     });
 
     it('Should create folder inside parent by its "id"', async () => {
