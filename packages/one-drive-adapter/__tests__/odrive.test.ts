@@ -6,6 +6,7 @@ import { config } from 'dotenv';
 import { Client, Options } from '@microsoft/microsoft-graph-client';
 import { readFileSync, writeFileSync } from 'fs';
 import { OneDriveAdapter } from '../src';
+import { OneDriveItem } from '../dist/one-drive-item.interface';
 
 config({ path: '.test.env' });
 
@@ -26,9 +27,20 @@ describe('OneDriveAdapter package testing', () => {
         flysystem = Flysystem.init(new OneDriveAdapter(origin));
     });
 
+    it.only('Should get file\'s metadata', async () => {
+        const pic = readFileSync(TEST_PIC_PATH);
+        const data: OneDriveItem = await origin
+            .api(`/me/drive/root:/test-pic-${new Date().getTime()}.jpg:/content`)
+            .put(pic);
+        const res = await flysystem.getById(data.id);
+        expect(res.id).toBe(data.id);
+        expect(res.parentFolderId).toBe(data.parentReference?.id);
+        expect(res.isFolder).toBe(false);
+    });
+
     it('Should download file', async () => {
         const pic = readFileSync(TEST_PIC_PATH);
-        const { id } = await origin.api(`/me/drive/root:/test-pic-${new Date().getTime()}:/content`).put(pic);
+        const { id } = await origin.api(`/me/drive/root:/test-pic-${new Date().getTime()}.jpg:/content`).put(pic);
         const res = await flysystem.downloadById(id);
 
         expect(res.length).toBe(pic.length);
