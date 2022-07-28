@@ -8,7 +8,6 @@ type UploadByIdArgs = [
     {
         name: string,
         parentId?: string,
-        mimeType?: string,
     },
 ];
 type MkdirByIdArgs = [{

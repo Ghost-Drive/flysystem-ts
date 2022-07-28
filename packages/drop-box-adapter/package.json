@@ -31,7 +31,10 @@
   "dependencies": {
     "@flysystem-ts/adapter-interface": "^1.2.0",
     "@flysystem-ts/common": "^1.2.0",
+    "@types/mime-types": "^2.1.1",
     "dropbox": "^10.30.0",
+    "file-type": "14",
+    "mime-types": "^2.1.35",
     "moment": "^2.29.3"
   },
   "gitHead": "a566b42a9f49466a85ffa1cd1600c71a20635382",

@@ -3,6 +3,7 @@ export type StorageItem = {
     isFolder?: boolean | null;
     name?: string | null;
     mimeType?: string | null;
+    extension?: string | null;
     size?: number | string | null;
     trashed?: boolean | null;
     parentFolderId?: string | null;

@@ -11,16 +11,26 @@ import {
     SuccessRes,
     UploadById,
 } from '@flysystem-ts/common';
+import { extension } from 'mime-types';
+import { fromBuffer } from 'file-type';
 import { Dropbox, DropboxResponseError, files } from 'dropbox';
 
-const nativeToCommon = (item: files.DeletedMetadataReference | files.FileMetadataReference | files.FolderMetadataReference): StorageItem => ({
-    id: (item as files.FileMetadataReference).id,
-    name: (item as files.FileMetadataReference).name,
-    isFolder: item['.tag'] === 'folder',
-    path: item.path_lower,
-    size: (item as files.FileMetadataReference).size,
-    parentFolderId: item.parent_shared_folder_id,
-});
+const nativeToCommon = (item: files.DeletedMetadataReference | files.FileMetadataReference | files.FolderMetadataReference): StorageItem => {
+    const isFolder = item['.tag'] === 'folder';
+    const ext = item.name.split('.').at(-1) || 'unknown';
+    const mimeType = extension(ext) || 'unknown';
+
+    return {
+        id: (item as files.FileMetadataReference).id,
+        name: (item as files.FileMetadataReference).name,
+        isFolder,
+        path: item.path_lower,
+        size: (item as files.FileMetadataReference).size,
+        parentFolderId: item.parent_shared_folder_id,
+        mimeType,
+        extension: ext,
+    };
+};
 const slashResolver = (path: string) => (path.startsWith('/')
     ? path
     : `/${path}`);
@@ -70,8 +80,11 @@ export class DBoxAdapter implements Adapter, GetById, MakeDirById, DeleteById, U
             path,
             contents: data,
         });
+        const { ext, mime } = await fromBuffer(data) || { ext: 'unknown', mime: 'unknown' };
 
         return {
+            extension: ext,
+            mimeType: mime,
             id: result.id,
             isFolder: false,
             size: result.size,
