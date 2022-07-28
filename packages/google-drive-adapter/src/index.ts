@@ -9,20 +9,27 @@ import {
     UploadById,
 } from '@flysystem-ts/common';
 import { drive_v3 } from 'googleapis';
+import { extname } from 'path';
 import { Readable } from 'stream';
+import { getType } from 'mime';
 
 export const FOLDER_MIME_TYPE = 'application/vnd.google-apps.folder' as const;
 
-const nativeToCommon = (item: drive_v3.Schema$File): StorageItem => ({
-    id: item.id,
-    isFolder: item.mimeType === FOLDER_MIME_TYPE,
-    name: item.name,
-    mimeType: item.mimeType || 'unknown',
-    size: item.size,
-    trashed: item.trashed,
-    parentFolderId: item?.parents?.[0],
-    extension: item.fileExtension || 'unknown',
-});
+const nativeToCommon = (item: drive_v3.Schema$File): StorageItem => {
+    const extension = item.fileExtension || extname(item.name!) || 'unknown';
+    const mimeType = item.mimeType || getType(extension) || 'unknown';
+
+    return {
+        id: item.id,
+        isFolder: item.mimeType === FOLDER_MIME_TYPE,
+        name: item.name,
+        size: item.size,
+        trashed: item.trashed,
+        parentFolderId: item?.parents?.[0],
+        extension,
+        mimeType,
+    };
+};
 
 export class GDriveAdapter implements Adapter, GetById, MakeDirById, DeleteById, UploadById, DownloadById {
     constructor(private gDrive: drive_v3.Drive) {

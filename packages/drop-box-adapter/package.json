@@ -34,12 +34,14 @@
     "@types/mime-types": "^2.1.1",
     "dropbox": "^10.30.0",
     "file-type": "14",
+    "mime": "^3.0.0",
     "mime-types": "^2.1.35",
     "moment": "^2.29.3"
   },
   "gitHead": "a566b42a9f49466a85ffa1cd1600c71a20635382",
   "devDependencies": {
     "@flysystem-ts/flysystem": "^1.2.0",
+    "@types/mime": "^2.0.3",
     "dotenv": "^16.0.1"
   }
 }

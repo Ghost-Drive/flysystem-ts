@@ -11,14 +11,15 @@ import {
     SuccessRes,
     UploadById,
 } from '@flysystem-ts/common';
-import { extension } from 'mime-types';
+import { getType } from 'mime';
 import { fromBuffer } from 'file-type';
+import { extname } from 'path';
 import { Dropbox, DropboxResponseError, files } from 'dropbox';
 
 const nativeToCommon = (item: files.DeletedMetadataReference | files.FileMetadataReference | files.FolderMetadataReference): StorageItem => {
     const isFolder = item['.tag'] === 'folder';
-    const ext = item.name.split('.').at(-1) || 'unknown';
-    const mimeType = extension(ext) || 'unknown';
+    const extension = extname(item.name) || 'unknown';
+    const mimeType = getType(extension) || 'unknown';
 
     return {
         id: (item as files.FileMetadataReference).id,
@@ -28,7 +29,7 @@ const nativeToCommon = (item: files.DeletedMetadataReference | files.FileMetadat
         size: (item as files.FileMetadataReference).size,
         parentFolderId: item.parent_shared_folder_id,
         mimeType,
-        extension: ext,
+        extension,
     };
 };
 const slashResolver = (path: string) => (path.startsWith('/')

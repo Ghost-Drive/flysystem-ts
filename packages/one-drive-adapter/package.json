@@ -27,6 +27,7 @@
   },
   "devDependencies": {
     "@flysystem-ts/flysystem": "^1.2.0",
+    "@types/mime": "^2.0.3",
     "axios": "^0.27.2",
     "dotenv": "^16.0.1",
     "isomorphic-fetch": "^3.0.0",
@@ -38,6 +39,8 @@
   "dependencies": {
     "@flysystem-ts/adapter-interface": "^1.2.0",
     "@flysystem-ts/common": "^1.2.0",
-    "@microsoft/microsoft-graph-client": "^3.0.2"
+    "@microsoft/microsoft-graph-client": "^3.0.2",
+    "@types/mime-types": "^2.1.1",
+    "mime": "^3.0.0"
   }
 }

@@ -4,13 +4,17 @@ import {
 } from '@flysystem-ts/common';
 import { Client } from '@microsoft/microsoft-graph-client';
 import 'isomorphic-fetch';
+import { getType } from 'mime';
 import { Blob } from 'buffer';
+import { extname } from 'path';
 import { OneDriveItem } from './one-drive-item.interface';
 
 function nativeToCommon(item: OneDriveItem): StorageItem {
     const {
         id, name, parentReference, folder, size, deleted,
     } = item;
+    const extension = extname(name) || 'unknown';
+    const mimeType = getType(extension) || 'unknown';
 
     return {
         id,
@@ -23,6 +27,8 @@ function nativeToCommon(item: OneDriveItem): StorageItem {
         size,
         trashed: !!deleted,
         isFolder: !!folder,
+        mimeType,
+        extension,
     };
 }
 
