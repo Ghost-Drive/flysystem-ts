@@ -17,10 +17,11 @@ const nativeToCommon = (item: drive_v3.Schema$File): StorageItem => ({
     id: item.id,
     isFolder: item.mimeType === FOLDER_MIME_TYPE,
     name: item.name,
-    mimeType: item.mimeType,
+    mimeType: item.mimeType || 'unknown',
     size: item.size,
     trashed: item.trashed,
     parentFolderId: item?.parents?.[0],
+    extension: item.fileExtension || 'unknown',
 });
 
 export class GDriveAdapter implements Adapter, GetById, MakeDirById, DeleteById, UploadById, DownloadById {
@@ -88,13 +89,15 @@ export class GDriveAdapter implements Adapter, GetById, MakeDirById, DeleteById,
                 ...(mimeType && { mimeType }),
                 body: Readable.from(data),
             },
-            fields: 'id,size,name,mimeType,parents',
+            fields: 'id,size,name,mimeType,parents,fileExtension',
         });
 
         return {
             id: res.id,
             isFolder: res.mimeType === FOLDER_MIME_TYPE,
             name: res.name,
+            mimeType: res.mimeType || 'unknown',
+            extension: res.fileExtension || res.name?.split('.').at(-1) || 'unknown',
             size: res.size,
             ...(res.parents?.[0] && { parentFolderId: res.parents[0] }),
         };
