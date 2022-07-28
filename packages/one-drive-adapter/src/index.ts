@@ -50,7 +50,6 @@ export class OneDriveAdapter implements Adapter, MakeDirById, DeleteById, Upload
     async uploadById(data: Buffer, options: {
         name: string,
         parentId?: string,
-        mimeType?: string,
     }): Promise<StorageItem> {
         const { name, parentId } = options;
         const graph = parentId

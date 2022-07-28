@@ -70,7 +70,6 @@ export class DBoxAdapter implements Adapter, GetById, MakeDirById, DeleteById, U
     async uploadById(data: Buffer, metadata: {
         name: string,
         parentId?: string,
-        mimeType?: string,
     }): Promise<StorageItem> {
         const { name, parentId } = metadata;
         const parentPath = parentId

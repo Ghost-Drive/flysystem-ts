@@ -35,7 +35,6 @@ export class Flysystem {
 
     uploadById(data: Buffer, metadata: {
         name: string,
-        mimeType?: string,
         parentId?: string,
     }) {
         return this.resolveOrReject(this.adapter.uploadById(data, metadata));

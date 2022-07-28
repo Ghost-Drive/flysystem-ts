@@ -84,30 +84,20 @@ export class GDriveAdapter implements Adapter, GetById, MakeDirById, DeleteById,
     async uploadById(data: Buffer, metadata: {
         name: string,
         parentId?: string,
-        mimeType?: string,
     }): Promise<StorageItem> {
-        const { name, parentId, mimeType } = metadata;
+        const { name, parentId } = metadata;
         const { data: res } = await this.gDrive.files.create({
             requestBody: {
                 name,
                 ...(parentId && { parents: [parentId] }),
             },
             media: {
-                ...(mimeType && { mimeType }),
                 body: Readable.from(data),
             },
             fields: 'id,size,name,mimeType,parents,fileExtension',
         });
 
-        return {
-            id: res.id,
-            isFolder: res.mimeType === FOLDER_MIME_TYPE,
-            name: res.name,
-            mimeType: res.mimeType || 'unknown',
-            extension: res.fileExtension || res.name?.split('.').at(-1) || 'unknown',
-            size: res.size,
-            ...(res.parents?.[0] && { parentFolderId: res.parents[0] }),
-        };
+        return nativeToCommon(res);
     }
 
     async deleteById(id: string, soft = false): Promise<SuccessRes> {
