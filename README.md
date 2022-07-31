@@ -1,20 +1,13 @@
 ![](https://progress-bar.dev/40/?title=in_progress)
 
-# Flysystem-ts
-File storage library for Node.js
+### Integration Framework for GhostDrive | Node Js
 
-### Description
-Node.js library for working with any storage system, for example DropBox, GoogleDrive, OneDrive etc.
-This library was created for two main purposes:
-* provide common usage interface for client code to operate with any of storages
-* provide simple way to create custom storage usage implementation with common concept
+The library's primary function and feature:
 
-> One of the main features and purposes of this library
-> is possibility to provide simple way for everyone to became part of this project.
-> You may create your own adapters that will be compatible with general modules and powered by them.
-> Another feature is partial typing. Your adapter may not implement completely all interface, but only part.
-> And that's enough. It simply will use as such not-completed type, so you still use it and
-> you can't call not-implemented methods at once.
+Give everyone an easy way to take part in this project
+You can make your own adapters that work with general modules
+Get paid in full for every integration in GxD Tokens. 
+
 ---
 > Also note, that project is at the development state.
 > So many things are ready to change.
@@ -22,11 +15,12 @@ This library was created for two main purposes:
 > in adapters but also computed typings etc... And all of this will be strongly typed in dynamic!
 
 ### Main Features:
-* Common interface for every storage
-* Customizable and open to setting interfaces
-* Typings and flexibility natures in one box
+* Common interface for all storage 
+* Customizable and open to setting interfaces 
+* Typings and flexibility in one box
 
-## General modules (you should use them for create own adapters):
+## General modules 
+(you should use them for create own adapters):
 * [Common](./packages/common) => base types, concepts, interfaces etc.
 * [Flysystem](./packages/flysystem) => main class for initiate adapter instance
 * [Adapter Interface](./packages/adapter-interface) => Minimal stuff that each adapter should implement with a bunch of methods that should be implemented by adapter optionally
@@ -93,3 +87,7 @@ Promise.all([
 
 # Attention!
 This project is developing right! His versions may be incompatible with each other.
+
+# Flysystem-ts
+File storage library for Node.js
+
