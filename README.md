@@ -4,9 +4,9 @@
 
 The library's primary function and feature:
 
-Give everyone an easy way to take part in this project
-You can make your own adapters that work with general modules
-Get paid in full for every integration in GxD Tokens. 
+>Give everyone an easy way to take part in this project<br>
+>You can make your own adapters that work with general modules<br>
+>Get paid in full for every integration in GxD Tokens. 
 
 ---
 > Also note, that project is at the development state.
