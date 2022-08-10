@@ -1,6 +1,6 @@
 import { Adapter } from '@flysystem-ts/adapter-interface';
 import {
-    DeleteById, DownloadById, FlysystemException, GetById, MakeDirById, StorageItem, SuccessRes, UploadById,
+    DeleteById, DownloadById, FlysystemException, GetById, GetDownloadLinkById, MakeDirById, StorageItem, SuccessRes, UploadById,
 } from '@flysystem-ts/common';
 import { Client } from '@microsoft/microsoft-graph-client';
 import 'isomorphic-fetch';
@@ -32,8 +32,25 @@ function nativeToCommon(item: OneDriveItem): StorageItem {
     };
 }
 
-export class OneDriveAdapter implements Adapter, MakeDirById, DeleteById, UploadById, DownloadById, GetById {
+export class OneDriveAdapter implements
+    Adapter,
+    MakeDirById,
+    DeleteById,
+    UploadById,
+    DownloadById,
+    GetById,
+    GetDownloadLinkById {
     constructor(private msClient: Client) {}
+
+    async getDownloadLinkById(id: string) {
+        const res = await this.msClient.api(`/shares/${id}`).get();
+
+        // TODO check!
+        return {
+            link: res,
+            expiredAt: null,
+        };
+    }
 
     async getById(id: string): Promise<StorageItem> {
         const res = await this.msClient.api(`/me/drive/items/${id}`).get();

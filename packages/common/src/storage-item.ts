@@ -9,4 +9,5 @@ export type StorageItem = {
     parentFolderId?: string | null;
     parentFolderName?: string | null;
     path?: string | null;
+    downloadLink?: string | null;
 }

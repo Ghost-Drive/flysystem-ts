@@ -16,8 +16,12 @@ type MkdirByIdArgs = [{
 }];
 type DeleteByIdArgs = [string, boolean];
 
-export interface GetById extends Method<MethodEnum.GET_BY_ID, [string], StorageItem> {}
-export interface DeleteById extends Method<MethodEnum.DELETE_BY_ID, DeleteByIdArgs, SuccessRes> {}
-export interface UploadById extends Method<MethodEnum.UPLOAD_BY_ID, UploadByIdArgs, StorageItem> {}
-export interface DownloadById extends Method<MethodEnum.DOWNLOAD_BY_ID, [string], Buffer> {}
-export interface MakeDirById extends Method<MethodEnum.MKDIR_BY_ID, MkdirByIdArgs, StorageItem> {}
+export interface GetById extends Method<MethodEnum.GET_BY_ID, [string], StorageItem> { }
+export interface DeleteById extends Method<MethodEnum.DELETE_BY_ID, DeleteByIdArgs, SuccessRes> { }
+export interface UploadById extends Method<MethodEnum.UPLOAD_BY_ID, UploadByIdArgs, StorageItem> { }
+export interface DownloadById extends Method<MethodEnum.DOWNLOAD_BY_ID, [string], Buffer> { }
+export interface MakeDirById extends Method<MethodEnum.MKDIR_BY_ID, MkdirByIdArgs, StorageItem> { }
+export interface GetDownloadLinkById extends Method<MethodEnum.GET_DOWNLOAD_LINK_BY_ID, [string], {
+    link?: string | null,
+    expiredAt?: number | null,
+}> { }

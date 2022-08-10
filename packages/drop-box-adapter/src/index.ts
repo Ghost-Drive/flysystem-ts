@@ -10,6 +10,7 @@ import {
     StorageItem,
     SuccessRes,
     UploadById,
+    GetDownloadLinkById,
 } from '@flysystem-ts/common';
 import { getType } from 'mime';
 import { fromBuffer } from 'file-type';
@@ -36,8 +37,26 @@ const slashResolver = (path: string) => (path.startsWith('/')
     ? path
     : `/${path}`);
 
-export class DBoxAdapter implements Adapter, GetById, MakeDirById, DeleteById, UploadById, DownloadById {
-    constructor(private dBox: Dropbox) {}
+export class DBoxAdapter implements
+    Adapter,
+    GetById,
+    MakeDirById,
+    DeleteById,
+    UploadById,
+    DownloadById,
+    GetDownloadLinkById {
+    constructor(private dBox: Dropbox) { }
+
+    async getDownloadLinkById(id: string): Promise<{ link: string, expiredAt: number }> {
+        const res = await this.dBox.filesGetTemporaryLink({
+            path: id,
+        });
+
+        return {
+            link: res.result.link,
+            expiredAt: new Date().getTime() + 1000 * 60 * 60 * 4,
+        };
+    }
 
     async getById(id: string): Promise<StorageItem> {
         const { result } = await this.dBox.filesGetMetadata({ path: id });

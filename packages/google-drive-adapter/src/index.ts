@@ -7,6 +7,7 @@ import {
     StorageItem,
     SuccessRes,
     UploadById,
+    GetDownloadLinkById,
 } from '@flysystem-ts/common';
 import { drive_v3 } from 'googleapis';
 import { extname } from 'path';
@@ -31,8 +32,46 @@ const nativeToCommon = (item: drive_v3.Schema$File): StorageItem => {
     };
 };
 
-export class GDriveAdapter implements Adapter, GetById, MakeDirById, DeleteById, UploadById, DownloadById {
+export class GDriveAdapter implements
+    Adapter,
+    GetById,
+    MakeDirById,
+    DeleteById,
+    UploadById,
+    DownloadById,
+    GetDownloadLinkById {
     constructor(private gDrive: drive_v3.Drive) {
+    }
+
+    async getDownloadLinkById(id: string) {
+        const res = await this.gDrive.files.get({
+            fileId: id,
+            fields: 'webContentLink',
+        });
+
+        return {
+            link: res.data.webContentLink,
+            expiredAt: null, // TODO check is it really infinity expiration
+        };
+    }
+
+    async uploadById(data: Buffer, metadata: {
+        name: string,
+        parentId?: string,
+    }): Promise<StorageItem> {
+        const { name, parentId } = metadata;
+        const { data: res } = await this.gDrive.files.create({
+            requestBody: {
+                name,
+                ...(parentId && { parents: [parentId] }),
+            },
+            media: {
+                body: Readable.from(data),
+            },
+            fields: 'id,size,name,mimeType,parents,fileExtension',
+        });
+
+        return nativeToCommon(res);
     }
 
     exceptionsPipe(error: any) {
@@ -79,25 +118,6 @@ export class GDriveAdapter implements Adapter, GetById, MakeDirById, DeleteById,
         });
 
         return nativeToCommon(data);
-    }
-
-    async uploadById(data: Buffer, metadata: {
-        name: string,
-        parentId?: string,
-    }): Promise<StorageItem> {
-        const { name, parentId } = metadata;
-        const { data: res } = await this.gDrive.files.create({
-            requestBody: {
-                name,
-                ...(parentId && { parents: [parentId] }),
-            },
-            media: {
-                body: Readable.from(data),
-            },
-            fields: 'id,size,name,mimeType,parents,fileExtension',
-        });
-
-        return nativeToCommon(res);
     }
 
     async deleteById(id: string, soft = false): Promise<SuccessRes> {

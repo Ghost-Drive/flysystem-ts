@@ -41,6 +41,7 @@
     "@flysystem-ts/common": "^1.2.1",
     "@microsoft/microsoft-graph-client": "^3.0.2",
     "@types/mime-types": "^2.1.1",
-    "mime": "^3.0.0"
+    "mime": "^3.0.0",
+    "qs": "^6.11.0"
   }
 }
