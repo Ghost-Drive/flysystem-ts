@@ -40,14 +40,15 @@ export class OneDriveAdapter implements
     DownloadById,
     GetById,
     GetDownloadLinkById {
-    constructor(private msClient: Client) {}
+    constructor(private msClient: Client) { }
 
     async getDownloadLinkById(id: string) {
-        const res = await this.msClient.api(`/shares/${id}`).get();
+        const res = await this.msClient.api(`/me/drive/items/${id}/createLink`).post({
+            type: 'embed',
+        });
 
-        // TODO check!
         return {
-            link: res,
+            link: res.link.webUrl,
             expiredAt: null,
         };
     }
@@ -105,7 +106,7 @@ export class OneDriveAdapter implements
             .api(graph)
             .post({
                 name,
-                folder: { },
+                folder: {},
             });
 
         return nativeToCommon(res);

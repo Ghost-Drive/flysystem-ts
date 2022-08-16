@@ -29,6 +29,9 @@
     "url": "https://github.com/Ghost-Drive/flysystem-ts/issues"
   },
   "gitHead": "a566b42a9f49466a85ffa1cd1600c71a20635382",
+  "devDependencies": {
+    "class-validator": "^0.13.2"
+  },
   "dependencies": {
     "@flysystem-ts/common": "^1.3.0"
   }

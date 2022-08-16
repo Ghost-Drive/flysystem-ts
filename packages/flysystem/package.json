@@ -30,6 +30,7 @@
   },
   "devDependencies": {
     "@types/lodash": "^4.14.182",
+    "class-validator": "^0.13.2",
     "lodash": "^4.17.21"
   },
   "gitHead": "a566b42a9f49466a85ffa1cd1600c71a20635382",

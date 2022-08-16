@@ -5,6 +5,7 @@ import { join } from 'path';
 import { config } from 'dotenv';
 import { Client, Options } from '@microsoft/microsoft-graph-client';
 import { readFileSync, writeFileSync } from 'fs';
+import { isURL } from 'class-validator';
 import { OneDriveAdapter } from '../src';
 import { OneDriveItem } from '../dist/one-drive-item.interface';
 
@@ -27,7 +28,20 @@ describe('OneDriveAdapter package testing', () => {
         flysystem = Flysystem.init(new OneDriveAdapter(origin));
     });
 
-    it.only('Should get file\'s metadata', async () => {
+    it('Should get upload link', async () => {
+        const pic = readFileSync(TEST_PIC_PATH);
+        const data: OneDriveItem = await origin
+            .api(`/me/drive/root:/test-pic-${new Date().getTime()}.jpg:/content`)
+            .put(pic);
+
+        const actual = await flysystem.getDownloadLinkById(data.id);
+
+        expect(actual).toBeDefined();
+        expect(actual.link).toBeDefined();
+        expect(isURL(actual.link)).toBe(true);
+    });
+
+    it('Should get file\'s metadata', async () => {
         const pic = readFileSync(TEST_PIC_PATH);
         const data: OneDriveItem = await origin
             .api(`/me/drive/root:/test-pic-${new Date().getTime()}.jpg:/content`)

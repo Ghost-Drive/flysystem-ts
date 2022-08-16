@@ -1,9 +1,9 @@
 import { Adapter } from '@flysystem-ts/adapter-interface';
 import {
-    DeleteById, DownloadById, FlysystemException, GetById, MakeDirById, UploadById,
+    DeleteById, DownloadById, FlysystemException, GetById, MakeDirById, UploadById, GetDownloadLinkById,
 } from '@flysystem-ts/common';
 
-type FullAdapter = Adapter & GetById & DeleteById & UploadById & DownloadById & MakeDirById;
+type FullAdapter = Adapter & GetById & DeleteById & UploadById & DownloadById & MakeDirById & GetDownloadLinkById;
 
 export class Flysystem {
     private constructor(private adapter: FullAdapter) {}
@@ -46,5 +46,9 @@ export class Flysystem {
 
     downloadById(id: string) {
         return this.resolveOrReject(this.adapter.downloadById(id));
+    }
+
+    getDownloadLinkById(id: string) {
+        return this.resolveOrReject(this.adapter.getDownloadLinkById(id));
     }
 }
