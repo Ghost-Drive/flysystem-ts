@@ -46,12 +46,12 @@ export class GDriveAdapter implements
     async getDownloadLinkById(id: string) {
         const res = await this.gDrive.files.get({
             fileId: id,
-            fields: 'webContentLink',
+            fields: 'webViewLink',
         });
 
         return {
-            link: res.data.webContentLink,
-            expiredAt: null, // TODO check is it really infinity expiration
+            link: res.data.webViewLink,
+            expiredAt: null,
         };
     }
 
