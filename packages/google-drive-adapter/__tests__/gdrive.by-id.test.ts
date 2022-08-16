@@ -40,7 +40,7 @@ describe('GDrive: by "id" strategy', () => {
         flysystem = Flysystem.init<GDriveAdapter>(new GDriveAdapter(origin));
     });
 
-    it.only('Should return download link', async () => {
+    it('Should return download link', async () => {
         const [id] = preIds;
 
         expect(id).toBeDefined();
