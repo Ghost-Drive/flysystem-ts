@@ -1,6 +1,16 @@
 import { Adapter } from '@flysystem-ts/adapter-interface';
 import {
-    DeleteById, DownloadById, FlysystemException, GetById, GetDownloadLinkById, MakeDirById, StorageItem, SuccessRes, UploadById,
+    DeleteById,
+    DownloadById,
+    FlysystemException,
+    GetById,
+    GetDownloadLinkById,
+    IsFileExistsByPath,
+    MakeDirById,
+    StorageItem,
+    SuccessRes,
+    UploadById,
+    slashResolver,
 } from '@flysystem-ts/common';
 import { Client } from '@microsoft/microsoft-graph-client';
 import 'isomorphic-fetch';
@@ -39,8 +49,26 @@ export class OneDriveAdapter implements
     UploadById,
     DownloadById,
     GetById,
-    GetDownloadLinkById {
+    GetDownloadLinkById,
+    IsFileExistsByPath {
     constructor(private msClient: Client) { }
+
+    async isFileExistsByPath(path: string): Promise<false | string> {
+        try {
+            const res = await this
+                .msClient
+                .api(`/me/drive/root:${slashResolver(path)}:/content`)
+                .get();
+
+            console.log(res);
+
+            return res as any;
+        } catch (error) {
+            console.error(error);
+
+            return false;
+        }
+    }
 
     async getDownloadLinkById(id: string) {
         const res = await this.msClient.api(`/me/drive/items/${id}/createLink`).post({

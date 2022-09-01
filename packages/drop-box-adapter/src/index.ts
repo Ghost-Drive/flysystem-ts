@@ -12,6 +12,7 @@ import {
     UploadById,
     GetDownloadLinkById,
     IsFileExistsByPath,
+    slashResolver,
 } from '@flysystem-ts/common';
 import { getType } from 'mime';
 import { fromBuffer } from 'file-type';
@@ -34,9 +35,6 @@ const nativeToCommon = (item: files.DeletedMetadataReference | files.FileMetadat
         extension,
     };
 };
-const slashResolver = (path: string) => (path.startsWith('/')
-    ? path
-    : `/${path}`);
 
 export class DBoxAdapter implements
     Adapter,

@@ -28,6 +28,10 @@ describe('OneDriveAdapter package testing', () => {
         flysystem = Flysystem.init(new OneDriveAdapter(origin));
     });
 
+    it.only('Should return false because this file is not exists', async () => {
+        await flysystem.isFileExistsByPath('/hello-world.txt');
+    });
+
     it('Should get upload link', async () => {
         const pic = readFileSync(TEST_PIC_PATH);
         const data: OneDriveItem = await origin
