@@ -55,18 +55,16 @@ export class OneDriveAdapter implements
 
     async isFileExistsByPath(path: string): Promise<false | string> {
         try {
-            const res = await this
+            const { id } = await this
                 .msClient
-                .api(`/me/drive/root:${slashResolver(path)}:/content`)
+                .api(`/me/drive/root:${slashResolver(path)}:`)
                 .get();
 
-            console.log(res);
+            return id;
+        } catch (error: any) {
+            if (error.code === 'itemNotFound') return false;
 
-            return res as any;
-        } catch (error) {
-            console.error(error);
-
-            return false;
+            throw error;
         }
     }
 

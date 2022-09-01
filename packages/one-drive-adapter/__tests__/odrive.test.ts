@@ -28,8 +28,20 @@ describe('OneDriveAdapter package testing', () => {
         flysystem = Flysystem.init(new OneDriveAdapter(origin));
     });
 
-    it.only('Should return false because this file is not exists', async () => {
-        await flysystem.isFileExistsByPath('/hello-world.txt');
+    it('Should return false because such file is does not exists', async () => {
+        const fakePath = 't/h/i/s/i/s/f/a/k/e/p/a/t/h';
+        await expect(origin.api(`/me/drive/root:/${fakePath}`)
+            .get())
+            .rejects
+            .toThrowError();
+        expect(await flysystem.isFileExistsByPath(fakePath)).toBe(false);
+    });
+
+    it('Should return file\'s id as proof that it exists', async () => {
+        const path = 'hello-world.txt';
+        const { id } = await origin.api(`/me/drive/root:/${path}`).get();
+
+        expect(await flysystem.isFileExistsByPath(path)).toBe(id);
     });
 
     it('Should get upload link', async () => {
