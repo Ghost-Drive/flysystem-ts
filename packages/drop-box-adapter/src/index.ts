@@ -51,12 +51,20 @@ export class DBoxAdapter implements
 
     async isFileExistsByPath(path: string): Promise<false | string> {
         const _path = slashResolver(path);
+
         try {
-            console.log('hi');
-            const res = await this.dBox.filesGetMetadata({ path: _path, include_deleted: false });
-            console.log(res);
-            return res as any;
-        } catch (error) {
+            const { result } = await this.dBox.filesGetMetadata({ path: _path, include_deleted: false });
+
+            return (result as any).id!;
+        } catch (error: any) {
+            if (error.error === 'Error in call to API function "files/get_metadata": request body: path: The root folder is unsupported.') {
+                throw new FlysystemException('You should not ask about root folder (at least when you use DropBox)', {
+                    originalError: error,
+                    storage: 'dropbox',
+                    type: 'DropboxResponseError',
+                });
+            }
+
             return false;
         }
     }

@@ -26,14 +26,23 @@ describe('DBox by "id" strategy', () => {
         flysystem = Flysystem.init<DBoxAdapter>(new DBoxAdapter(new Dropbox({ accessToken: DBX_ACCESS })));
     });
 
-    it.only(
+    it(
+        'Should return id of the file as a proof that it exists',
+        async () => {
+            const { result: { entries: [first] } } = await originSdk
+                .filesListFolder({ path: '' });
+            const actual = await flysystem.isFileExistsByPath(first.name);
+
+            expect(actual).toBe((first as any).id);
+        },
+    );
+
+    it(
         'Should return false because there are any files by this path',
         async () => {
-            const path = '/a/n/y/f/i/e/s/b/y/t/h/i/s/p/a/t/h';
-            await expect(originSdk.filesGetMetadata({ path }))
+            await expect(flysystem.isFileExistsByPath('/'))
                 .rejects
-                .toThrow('Response failed with a 409 code');
-            expect(await flysystem.isFileExistsByPath(path)).toBe(false);
+                .toThrow('You should not ask about root folder (at least when you use DropBox)');
         },
     );
 
