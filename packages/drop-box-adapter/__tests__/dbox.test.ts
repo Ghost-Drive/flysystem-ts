@@ -26,6 +26,17 @@ describe('DBox by "id" strategy', () => {
         flysystem = Flysystem.init<DBoxAdapter>(new DBoxAdapter(new Dropbox({ accessToken: DBX_ACCESS })));
     });
 
+    it.only(
+        'Should return false because there are any files by this path',
+        async () => {
+            const path = '/a/n/y/f/i/e/s/b/y/t/h/i/s/p/a/t/h';
+            await expect(originSdk.filesGetMetadata({ path }))
+                .rejects
+                .toThrow('Response failed with a 409 code');
+            expect(await flysystem.isFileExistsByPath(path)).toBe(false);
+        },
+    );
+
     it('Should return download link', async () => {
         const { result: { id } } = await originSdk.filesUpload({
             path: `/pic-${new Date().getTime()}.jpg`,

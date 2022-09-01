@@ -1,4 +1,4 @@
-core=(
+kcore=(
     "@flysystem-ts/common"
     "@flysystem-ts/adapter-interface"
 )

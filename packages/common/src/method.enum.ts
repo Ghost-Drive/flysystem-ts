@@ -6,4 +6,5 @@ export enum MethodEnum {
     DELETE_BY_ID = 'deleteById',
     DOWNLOAD_BY_ID = 'downloadById',
     GET_DOWNLOAD_LINK_BY_ID = 'getDownloadLinkById',
+    IS_FILE_EXISTS_BY_PATH = 'isFileExistsByPath',
 }

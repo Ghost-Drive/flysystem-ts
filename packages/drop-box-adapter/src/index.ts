@@ -11,6 +11,7 @@ import {
     SuccessRes,
     UploadById,
     GetDownloadLinkById,
+    IsFileExistsByPath,
 } from '@flysystem-ts/common';
 import { getType } from 'mime';
 import { fromBuffer } from 'file-type';
@@ -44,8 +45,21 @@ export class DBoxAdapter implements
     DeleteById,
     UploadById,
     DownloadById,
-    GetDownloadLinkById {
+    GetDownloadLinkById,
+    IsFileExistsByPath {
     constructor(private dBox: Dropbox) { }
+
+    async isFileExistsByPath(path: string): Promise<false | string> {
+        const _path = slashResolver(path);
+        try {
+            console.log('hi');
+            const res = await this.dBox.filesGetMetadata({ path: _path, include_deleted: false });
+            console.log(res);
+            return res as any;
+        } catch (error) {
+            return false;
+        }
+    }
 
     async getDownloadLinkById(id: string): Promise<{ link: string, expiredAt: number }> {
         const res = await this.dBox.filesGetTemporaryLink({

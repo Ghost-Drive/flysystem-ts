@@ -4,15 +4,15 @@ import { StorageItem } from './storage-item';
 import { SuccessRes } from './success-res.type';
 
 type UploadByIdArgs = [
-    Buffer,
-    {
-        name: string,
-        parentId?: string,
-    },
-];
-type MkdirByIdArgs = [{
+  Buffer,
+  {
     name: string,
     parentId?: string,
+  },
+];
+type MkdirByIdArgs = [{
+  name: string,
+  parentId?: string,
 }];
 type DeleteByIdArgs = [string, boolean];
 
@@ -22,6 +22,7 @@ export interface UploadById extends Method<MethodEnum.UPLOAD_BY_ID, UploadByIdAr
 export interface DownloadById extends Method<MethodEnum.DOWNLOAD_BY_ID, [string], Buffer> { }
 export interface MakeDirById extends Method<MethodEnum.MKDIR_BY_ID, MkdirByIdArgs, StorageItem> { }
 export interface GetDownloadLinkById extends Method<MethodEnum.GET_DOWNLOAD_LINK_BY_ID, [string], {
-    link?: string | null,
-    expiredAt?: number | null,
+  link?: string | null,
+  expiredAt?: number | null,
 }> { }
+export interface IsFileExistsByPath extends Method<MethodEnum.IS_FILE_EXISTS_BY_PATH, [string], false | string> { }
