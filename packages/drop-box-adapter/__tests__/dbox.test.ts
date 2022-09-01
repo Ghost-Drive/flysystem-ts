@@ -30,7 +30,7 @@ describe('DBox by "id" strategy', () => {
         'Should return id of the file as a proof that it exists',
         async () => {
             const { result: { entries: [first] } } = await originSdk
-                .filesListFolder({ path: '' });
+                .filesListFolder({ path: '', include_deleted: false, limit: 1 });
             const actual = await flysystem.isFileExistsByPath(first.name);
 
             expect(actual).toBe((first as any).id);
