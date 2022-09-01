@@ -10,23 +10,53 @@ import {
     StorageItem,
     SuccessRes,
     UploadById,
+    GetDownloadLinkById,
 } from '@flysystem-ts/common';
+import { getType } from 'mime';
+import { fromBuffer } from 'file-type';
+import { extname } from 'path';
 import { Dropbox, DropboxResponseError, files } from 'dropbox';
 
-const nativeToCommon = (item: files.DeletedMetadataReference | files.FileMetadataReference | files.FolderMetadataReference): StorageItem => ({
-    id: (item as files.FileMetadataReference).id,
-    name: (item as files.FileMetadataReference).name,
-    isFolder: item['.tag'] === 'folder',
-    path: item.path_lower,
-    size: (item as files.FileMetadataReference).size,
-    parentFolderId: item.parent_shared_folder_id,
-});
+const nativeToCommon = (item: files.DeletedMetadataReference | files.FileMetadataReference | files.FolderMetadataReference): StorageItem => {
+    const isFolder = item['.tag'] === 'folder';
+    const extension = extname(item.name) || 'unknown';
+    const mimeType = getType(extension) || 'unknown';
+
+    return {
+        id: (item as files.FileMetadataReference).id,
+        name: (item as files.FileMetadataReference).name,
+        isFolder,
+        path: item.path_lower,
+        size: (item as files.FileMetadataReference).size,
+        parentFolderId: item.parent_shared_folder_id,
+        mimeType,
+        extension,
+    };
+};
 const slashResolver = (path: string) => (path.startsWith('/')
     ? path
     : `/${path}`);
 
-export class DBoxAdapter implements Adapter, GetById, MakeDirById, DeleteById, UploadById, DownloadById {
-    constructor(private dBox: Dropbox) {}
+export class DBoxAdapter implements
+    Adapter,
+    GetById,
+    MakeDirById,
+    DeleteById,
+    UploadById,
+    DownloadById,
+    GetDownloadLinkById {
+    constructor(private dBox: Dropbox) { }
+
+    async getDownloadLinkById(id: string): Promise<{ link: string, expiredAt: number }> {
+        const res = await this.dBox.filesGetTemporaryLink({
+            path: id,
+        });
+
+        return {
+            link: res.result.link,
+            expiredAt: new Date().getTime() + 1000 * 60 * 60 * 4,
+        };
+    }
 
     async getById(id: string): Promise<StorageItem> {
         const { result } = await this.dBox.filesGetMetadata({ path: id });
@@ -59,7 +89,6 @@ export class DBoxAdapter implements Adapter, GetById, MakeDirById, DeleteById, U
     async uploadById(data: Buffer, metadata: {
         name: string,
         parentId?: string,
-        mimeType?: string,
     }): Promise<StorageItem> {
         const { name, parentId } = metadata;
         const parentPath = parentId
@@ -70,8 +99,11 @@ export class DBoxAdapter implements Adapter, GetById, MakeDirById, DeleteById, U
             path,
             contents: data,
         });
+        const { ext, mime } = await fromBuffer(data) || { ext: 'unknown', mime: 'unknown' };
 
         return {
+            extension: ext,
+            mimeType: mime,
             id: result.id,
             isFolder: false,
             size: result.size,

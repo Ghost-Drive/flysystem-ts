@@ -7,24 +7,71 @@ import {
     StorageItem,
     SuccessRes,
     UploadById,
+    GetDownloadLinkById,
 } from '@flysystem-ts/common';
 import { drive_v3 } from 'googleapis';
+import { extname } from 'path';
 import { Readable } from 'stream';
+import { getType } from 'mime';
 
 export const FOLDER_MIME_TYPE = 'application/vnd.google-apps.folder' as const;
 
-const nativeToCommon = (item: drive_v3.Schema$File): StorageItem => ({
-    id: item.id,
-    isFolder: item.mimeType === FOLDER_MIME_TYPE,
-    name: item.name,
-    mimeType: item.mimeType,
-    size: item.size,
-    trashed: item.trashed,
-    parentFolderId: item?.parents?.[0],
-});
+const nativeToCommon = (item: drive_v3.Schema$File): StorageItem => {
+    const extension = item.fileExtension || extname(item.name!) || 'unknown';
+    const mimeType = item.mimeType || getType(extension) || 'unknown';
 
-export class GDriveAdapter implements Adapter, GetById, MakeDirById, DeleteById, UploadById, DownloadById {
+    return {
+        id: item.id,
+        isFolder: item.mimeType === FOLDER_MIME_TYPE,
+        name: item.name,
+        size: item.size,
+        trashed: item.trashed,
+        parentFolderId: item?.parents?.[0],
+        extension,
+        mimeType,
+    };
+};
+
+export class GDriveAdapter implements
+    Adapter,
+    GetById,
+    MakeDirById,
+    DeleteById,
+    UploadById,
+    DownloadById,
+    GetDownloadLinkById {
     constructor(private gDrive: drive_v3.Drive) {
+    }
+
+    async getDownloadLinkById(id: string) {
+        const res = await this.gDrive.files.get({
+            fileId: id,
+            fields: 'webViewLink',
+        });
+
+        return {
+            link: res.data.webViewLink,
+            expiredAt: null,
+        };
+    }
+
+    async uploadById(data: Buffer, metadata: {
+        name: string,
+        parentId?: string,
+    }): Promise<StorageItem> {
+        const { name, parentId } = metadata;
+        const { data: res } = await this.gDrive.files.create({
+            requestBody: {
+                name,
+                ...(parentId && { parents: [parentId] }),
+            },
+            media: {
+                body: Readable.from(data),
+            },
+            fields: 'id,size,name,mimeType,parents,fileExtension',
+        });
+
+        return nativeToCommon(res);
     }
 
     exceptionsPipe(error: any) {
@@ -71,33 +118,6 @@ export class GDriveAdapter implements Adapter, GetById, MakeDirById, DeleteById,
         });
 
         return nativeToCommon(data);
-    }
-
-    async uploadById(data: Buffer, metadata: {
-        name: string,
-        parentId?: string,
-        mimeType?: string,
-    }): Promise<StorageItem> {
-        const { name, parentId, mimeType } = metadata;
-        const { data: res } = await this.gDrive.files.create({
-            requestBody: {
-                name,
-                ...(parentId && { parents: [parentId] }),
-            },
-            media: {
-                ...(mimeType && { mimeType }),
-                body: Readable.from(data),
-            },
-            fields: 'id,size,name,mimeType,parents',
-        });
-
-        return {
-            id: res.id,
-            isFolder: res.mimeType === FOLDER_MIME_TYPE,
-            name: res.name,
-            size: res.size,
-            ...(res.parents?.[0] && { parentFolderId: res.parents[0] }),
-        };
     }
 
     async deleteById(id: string, soft = false): Promise<SuccessRes> {

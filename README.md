@@ -56,6 +56,7 @@ export type StorageItem = {
     name?: string | null;
     mimeType?: string | null;
     size?: number | string | null;
+    extension?: string | null;
     trashed?: boolean | null;
     parentFolderId?: string | null;
     parentFolderName?: string | null;

@@ -1,16 +1,20 @@
 import { Adapter } from '@flysystem-ts/adapter-interface';
 import {
-    DeleteById, DownloadById, FlysystemException, GetById, MakeDirById, StorageItem, SuccessRes, UploadById,
+    DeleteById, DownloadById, FlysystemException, GetById, GetDownloadLinkById, MakeDirById, StorageItem, SuccessRes, UploadById,
 } from '@flysystem-ts/common';
 import { Client } from '@microsoft/microsoft-graph-client';
 import 'isomorphic-fetch';
+import { getType } from 'mime';
 import { Blob } from 'buffer';
+import { extname } from 'path';
 import { OneDriveItem } from './one-drive-item.interface';
 
 function nativeToCommon(item: OneDriveItem): StorageItem {
     const {
         id, name, parentReference, folder, size, deleted,
     } = item;
+    const extension = extname(name) || 'unknown';
+    const mimeType = getType(extension) || 'unknown';
 
     return {
         id,
@@ -23,11 +27,31 @@ function nativeToCommon(item: OneDriveItem): StorageItem {
         size,
         trashed: !!deleted,
         isFolder: !!folder,
+        mimeType,
+        extension,
     };
 }
 
-export class OneDriveAdapter implements Adapter, MakeDirById, DeleteById, UploadById, DownloadById, GetById {
-    constructor(private msClient: Client) {}
+export class OneDriveAdapter implements
+    Adapter,
+    MakeDirById,
+    DeleteById,
+    UploadById,
+    DownloadById,
+    GetById,
+    GetDownloadLinkById {
+    constructor(private msClient: Client) { }
+
+    async getDownloadLinkById(id: string) {
+        const res = await this.msClient.api(`/me/drive/items/${id}/createLink`).post({
+            type: 'embed',
+        });
+
+        return {
+            link: res.link.webUrl,
+            expiredAt: null,
+        };
+    }
 
     async getById(id: string): Promise<StorageItem> {
         const res = await this.msClient.api(`/me/drive/items/${id}`).get();
@@ -44,7 +68,6 @@ export class OneDriveAdapter implements Adapter, MakeDirById, DeleteById, Upload
     async uploadById(data: Buffer, options: {
         name: string,
         parentId?: string,
-        mimeType?: string,
     }): Promise<StorageItem> {
         const { name, parentId } = options;
         const graph = parentId
@@ -83,7 +106,7 @@ export class OneDriveAdapter implements Adapter, MakeDirById, DeleteById, Upload
             .api(graph)
             .post({
                 name,
-                folder: { },
+                folder: {},
             });
 
         return nativeToCommon(res);
