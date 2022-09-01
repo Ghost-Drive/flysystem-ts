@@ -28,6 +28,7 @@ describe('GDrive: by "id" strategy', () => {
             origin.files.create({
                 requestBody: {
                     name: `test-file-${new Date().getTime()}.jpg`,
+                    parents: ['root'],
                 },
                 media: {
                     body: Readable.from(readFileSync(TEST_PIC_PATH)),
@@ -38,6 +39,22 @@ describe('GDrive: by "id" strategy', () => {
 
     beforeEach(() => {
         flysystem = Flysystem.init<GDriveAdapter>(new GDriveAdapter(origin));
+    });
+
+    it('Should return file\'s id as proof of that it exists', async () => {
+        const folderName = `hello-${new Date().getTime()}-world`;
+        const { data } = await origin.files.create({
+            requestBody: {
+                mimeType: FOLDER_MIME_TYPE,
+                name: folderName,
+            },
+        });
+
+        expect(await flysystem.isFileExistsByPath(folderName)).toBe(data.id);
+    });
+
+    it('Should return false because this file is not exists', async () => {
+        expect(await flysystem.isFileExistsByPath('/n/o/f/i/l/e/b/y/t/h/i/s/p/a/t/h')).toBe(false);
     });
 
     it('Should return download link', async () => {
