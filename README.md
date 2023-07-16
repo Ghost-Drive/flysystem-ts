@@ -1,6 +1,6 @@
 ![](https://progress-bar.dev/40/?title=in_progress)
 
-### Integration Framework for GhostDrive | Node Js
+### Integration Framework for GhostDrive (Node Js)
 
 The library's primary function and feature:
 
@@ -14,7 +14,7 @@ The library's primary function and feature:
 > Especially in future this library should provide flexibility not only to partial implementation
 > in adapters but also computed typings etc... And all of this will be strongly typed in dynamic!
 
-### Main Features:
+### Features:
 * Common interface for all storage 
 * Customizable and open to setting interfaces 
 * Typings and flexibility in one box
@@ -37,7 +37,7 @@ The library's primary function and feature:
 npm i @flysystem-ts/flysystem @flysystem-ts/google-drive-adapter
 ```
 
-# How it looks in code:
+# Example:
 #### StorageItem
 ```ts
 /**
